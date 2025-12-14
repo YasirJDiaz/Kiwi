@@ -37,13 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.navigation.NavHostController
-import androidx.compose.runtime.saveable.rememberSaveable
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.KeyboardOptions
@@ -52,9 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
-import androidx.activity.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kiwi.viewmodel.SharedViewModel
 import android.widget.Toast
@@ -66,30 +58,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.runtime.snapshotFlow
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.core.graphics.drawable.toBitmap
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -109,7 +88,6 @@ import com.google.firebase.FirebaseApp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.google.firebase.firestore.Query
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.LaunchedEffect
 import com.google.firebase.messaging.FirebaseMessaging
@@ -1293,58 +1271,95 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
     val estadoActualPedido = viewModel.estadoPedido
+    var mensajeError by remember { mutableStateOf<String?>(null) }
 
 
     when (val estado = viewModel.estadoPedido) {
         is EstadoPedido.Success -> {
             AlertDialog(
                 onDismissRequest = { },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    dismissOnBackPress = false,
-                    dismissOnClickOutside = false
-                ),
                 title = { Text("Pedido enviado") },
                 text = { Text("Su pedido ha sido enviado con éxito y será revisado por la vendedora.") },
                 confirmButton = { }
             )
             LaunchedEffect(Unit) {
-                delay(2000) // 2 segundos
+                delay(2000)
                 viewModel.resetEstadoPedido()
                 navController.navigate("buyer") {
                     popUpTo("FacturaScreen") { inclusive = true }
                 }
             }
         }
-
         is EstadoPedido.Conflict -> {
             val conflicto = estado.info
             AlertDialog(
                 onDismissRequest = { viewModel.resetEstadoPedido() },
-                title = { Text("Inventario Insuficiente") },
+                title = { Text("Inventario insuficiente") },
                 text = {
-                    val nombresAgotados = conflicto.productosAgotados.joinToString(", ") { it.producto?.nombre ?: "" }
-                    Text("Lo sentimos, el producto '$nombresAgotados' se agotó. ¿Qué deseas hacer?")
+                    // CAMBIO 1: Formato "Nombre - Referencia"
+                    // Usamos un salto de linea (\n) para que se vea ordenado si son varios
+                    val listaProductos = conflicto.productosAgotados.joinToString(separator = "\n") { item ->
+                        "${item.producto?.nombre ?: "Sin nombre"} - ${item.producto?.referencia ?: "N/A"}"
+                    }
+                    Text("Productos agotados:\n\n$listaProductos")
                 },
                 confirmButton = {
-                    TextButton(onClick = { }) {
-                        Text("Pedir solo disponibles")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = {
-                        viewModel.resetEstadoPedido()
-                        navController.navigate("carrito") {
-                            popUpTo("FacturaScreen") { inclusive = true }
+                    TextButton(
+                        onClick = {
+                            // CAMBIO 2: Navegar al carrito para editar
+                            viewModel.resetEstadoPedido() // Limpia el error
+                            navController.navigate("carrito") {
+                                // Opcional: Esto ayuda a que no se duplique la pantalla del carrito
+                                popUpTo("carrito") { inclusive = true }
+                            }
                         }
-                    }) {
-                        Text("Editar mi carrito")
+                    ) {
+                        Text("Editar pedido")
                     }
                 }
             )
         }
-
-        is EstadoPedido.Loading -> { }
+        // CASO 1: Mostrar indicador de carga
+        is EstadoPedido.Loading -> {
+            Dialog(onDismissRequest = {}) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        // CASO 2: Manejar el error
+        is EstadoPedido.Failure -> {
+            // Guardamos el error para mostrarlo en un diálogo
+            LaunchedEffect(estado) {
+                mensajeError = estado.error
+            }
+        }
         else -> { }
+    }
+
+    // Diálogo para mostrar errores si ocurren
+    if (mensajeError != null) {
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.resetEstadoPedido()
+                mensajeError = null
+            },
+            title = { Text("Error") },
+            text = { Text(mensajeError ?: "Error desconocido") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.resetEstadoPedido()
+                    mensajeError = null
+                }) {
+                    Text("Cerrar")
+                }
+            }
+        )
     }
 
 
