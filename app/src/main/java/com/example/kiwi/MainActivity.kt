@@ -2,117 +2,174 @@ package com.example.kiwi
 //ID FIREBASE: kiwi-2025
 
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.kiwi.ui.theme.KiwiTheme
-import kotlinx.coroutines.delay
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.foundation.lazy.rememberLazyListState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import androidx.navigation.NavHostController
-import java.util.Locale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.kiwi.viewmodel.SharedViewModel
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.Check
-import coil.compose.rememberAsyncImagePainter
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.window.Dialog
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.Animatable
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Send
-import com.google.firebase.FirebaseApp
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.google.firebase.firestore.Query
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.example.kiwi.ui.theme.KiwiTheme
 import com.example.kiwi.viewmodel.EstadoPedido
+import com.example.kiwi.viewmodel.SharedViewModel
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Query
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Locale
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 
 
-class MainActivity : ComponentActivity()
-{
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         FirebaseMessaging.getInstance().subscribeToTopic("new_products")
-            .addOnCompleteListener { task ->
-                var msg = "Suscrito a notificaciones de nuevos productos"
-                if (!task.isSuccessful) {
-                    msg = "Error al suscribirse a notificaciones"
-                }
-                Log.d("FCM", msg)
-            }
+        FirebaseMessaging.getInstance().subscribeToTopic("pedidos_vendedora")
+
         setContent {
-
-            // Modificación de KiwiTheme para forzar el modo claro
             KiwiTheme(darkTheme = false) {
-
                 val navController = rememberNavController()
                 val sharedViewModel: SharedViewModel = viewModel()
                 val rotarCarrito = remember { mutableStateOf(false) }
@@ -120,55 +177,127 @@ class MainActivity : ComponentActivity()
                 val anguloCarrito by animateFloatAsState(
                     targetValue = if (rotarCarrito.value) 360f else 0f,
                     animationSpec = tween(durationMillis = 600),
-                    finishedListener = { rotarCarrito.value = false }
+                    finishedListener = { rotarCarrito.value = false },
+                    label = "rotacion"
                 )
 
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val rutaActual = navBackStackEntry?.destination?.route
+                val pantallasConBarra = listOf("catalogo", "carrito", "solicitudes", "FacturaScreen")
+                val mostrarBarra = rutaActual in pantallasConBarra || rutaActual?.startsWith("detalleProducto") == true
+                val usarFondoBlanco = false
 
-                NavHost(navController = navController, startDestination = "splash") {
-                    composable("splash") { SplashScreen { navController.navigate("login") } }
-                    composable("login") {
-                        LoginScreen(
-                            navController = navController,
-                            onCompradorClick = { navController.navigate("buyer") }
-                        )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    NavHost(navController = navController, startDestination = "carga") {
+                        composable("carga") { CargaScreen { navController.navigate("login") } }
+
+                        composable("login") {
+                            LoginScreen(
+                                navController = navController,
+                                onCompradorClick = { navController.navigate("catalogo") }
+                            )
+                        }
+
+                        composable("catalogo") {
+                            ClienteScreen(navController, sharedViewModel)
+                        }
+
+                        composable("carrito") {
+                            CarritoScreen(navController, sharedViewModel)
+                        }
+
+                        composable("solicitudes") {
+                            SolicitudesScreen(navController, sharedViewModel)
+                        }
+
+                        composable("detalleProducto/{productoId}") { backStackEntry ->
+                            val productoId = backStackEntry.arguments?.getString("productoId") ?: ""
+                            DetalleProductoScreen(
+                                productoId,
+                                navController,
+                                sharedViewModel,
+                                rotarCarrito,
+                                anguloCarrito
+                            )
+                        }
+
+                        composable("FacturaScreen") {
+                            FacturaScreen(navController, sharedViewModel)
+                        }
+
+                        composable("vendedoraMenu") {
+                            VendedoraMenuScreen(navController, sharedViewModel)
+                        }
+                        composable("agregarProducto") {
+                            AgregarProductoScreen(navController, sharedViewModel)
+                        }
+                        composable("vendedoraSolicitudes") {
+                            SolicitudesVendedoraScreen(navController, sharedViewModel)
+                        }
+                        composable("editarProducto/{productoId}") { backStackEntry ->
+                            val productoId = backStackEntry.arguments?.getString("productoId") ?: ""
+                            EditarProductoScreen(productoId, navController, sharedViewModel)
+                        }
                     }
 
-                    composable("buyer") {
-                        BuyerScreen(navController, sharedViewModel, anguloCarrito)
-                    }
+                    AnimatedVisibility(
+                        visible = mostrarBarra,
+                        enter = slideInVertically(
+                            initialOffsetY = { fullHeight -> fullHeight },
+                            animationSpec = tween(durationMillis = 400, delayMillis = 100)
+                        ) + fadeIn(animationSpec = tween(durationMillis = 400)),
+                        exit = slideOutVertically(
+                            targetOffsetY = { fullHeight -> fullHeight },
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeOut(animationSpec = tween(durationMillis = 300)),
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                    ) {
+                        Box(contentAlignment = Alignment.BottomCenter) {
 
-                    composable("carrito") {
-                        CarritoScreen(navController, sharedViewModel)
-                    }
+                            if (usarFondoBlanco) {
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(110.dp)
+                                        .align(Alignment.BottomCenter),
+                                    color = Color.White,
+                                    shadowElevation = 15.dp
+                                ) {}
+                            }
 
-                    composable("solicitudes") {
-                        SolicitudesScreen(navController, sharedViewModel)
-                    }
-
-                    composable("detalleProducto/{productoId}") { backStackEntry ->
-                        val productoId = backStackEntry.arguments?.getString("productoId") ?: ""
-                        DetalleProductoScreen(productoId, navController, sharedViewModel, rotarCarrito, anguloCarrito)
-                    }
-
-                    composable("vendedoraMenu") {
-                        VendedoraMenuScreen(navController, sharedViewModel)
-                    }
-
-                    composable("agregarProducto") {
-                        AgregarProductoScreen(navController, sharedViewModel)
-                    }
-
-                    composable("vendedoraSolicitudes") {
-                        SolicitudesVendedoraScreen(navController, sharedViewModel)
-                    }
-
-                    composable("FacturaScreen") {
-                        FacturaScreen(navController, sharedViewModel)
-                    }
-
-                    composable("editarProducto/{productoId}") { backStackEntry ->
-                        val productoId = backStackEntry.arguments?.getString("productoId") ?: ""
-                        EditarProductoScreen(productoId, navController, sharedViewModel)
+                            Navegacion(
+                                selectedTab = if (rutaActual == "FacturaScreen") "carrito" else (rutaActual ?: "catalogo"),
+                                onCatalogoClick = {
+                                    if (rutaActual != "catalogo") {
+                                        navController.navigate("catalogo") {
+                                            popUpTo("catalogo") { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                },
+                                onCarritoClick = {
+                                    if (rutaActual != "carrito") {
+                                        navController.navigate("carrito") {
+                                            popUpTo("catalogo") { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                },
+                                onSolicitudesClick = {
+                                    if (rutaActual != "solicitudes") {
+                                        navController.navigate("solicitudes") {
+                                            popUpTo("catalogo") { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                },
+                                tieneNotificacionSolicitudesComprador = sharedViewModel.tieneActualizacionSolicitudesComprador,
+                                rotacionCarrito = anguloCarrito
+                            )
+                        }
                     }
                 }
             }
@@ -176,9 +305,8 @@ class MainActivity : ComponentActivity()
     }
 }
 
-
 @Composable
-fun SplashScreen(onFinish: () -> Unit)
+fun CargaScreen(onFinish: () -> Unit)
 {
     LaunchedEffect(Unit) {
         delay(2000)
@@ -206,19 +334,17 @@ fun LoginScreen(navController: NavHostController, onCompradorClick: () -> Unit)
 
     var usuario by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
-    val context = LocalContext.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    var backPressedTime by remember { mutableStateOf(0L) }
-    val activity = (LocalContext.current as? ComponentActivity)
-
-    // Animación de rotación para el logo
-    val rotationAngle = remember { Animatable(0f) }
+    val mensaje = LocalContext.current
+    val tecladoControl = LocalSoftwareKeyboardController.current
+    var salir by remember { mutableStateOf(0L) }
+    val ejecutar = (LocalContext.current as? ComponentActivity)
+    val rotacion = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        rotationAngle.animateTo(
+        rotacion.animateTo(
             targetValue = 360f,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 3000), // Gira cada 3 segundos
+                animation = tween(durationMillis = 3000),
                 repeatMode = RepeatMode.Restart
             )
         )
@@ -226,14 +352,18 @@ fun LoginScreen(navController: NavHostController, onCompradorClick: () -> Unit)
 
     BackHandler(enabled = true) {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - backPressedTime < 2000) {
+        if (currentTime - salir < 2000) {
 
-            activity?.finish()
+            ejecutar?.finish()
         } else {
 
-            backPressedTime = currentTime
+            salir = currentTime
 
-            Toast.makeText(context, "Vuelve a presionar para salir de la aplicación", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                mensaje,
+                "Vuelve a presionar para salir de la aplicación",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -252,7 +382,7 @@ fun LoginScreen(navController: NavHostController, onCompradorClick: () -> Unit)
                 contentDescription = "Logo Kiwi",
                 modifier = Modifier
                     .size(100.dp)
-                    .graphicsLayer { rotationZ = rotationAngle.value } // Aplica la rotación animada
+                    .graphicsLayer { rotationZ = rotacion.value }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -275,7 +405,7 @@ fun LoginScreen(navController: NavHostController, onCompradorClick: () -> Unit)
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { keyboardController?.hide() }
+                    onDone = { tecladoControl?.hide() }
                 )
             )
 
@@ -293,7 +423,7 @@ fun LoginScreen(navController: NavHostController, onCompradorClick: () -> Unit)
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { keyboardController?.hide() }
+                    onDone = { tecladoControl?.hide() }
                 )
             )
 
@@ -302,27 +432,34 @@ fun LoginScreen(navController: NavHostController, onCompradorClick: () -> Unit)
 
             Button(
                 onClick = {
-                    // Validamos que los campos no estén vacíos
                     if (usuario.isNotBlank() && contrasena.isNotBlank()) {
-                        // Usamos Firebase para iniciar sesión
                         FirebaseAuth.getInstance().signInWithEmailAndPassword(usuario, contrasena)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    // Si las credenciales son correctas, navega al menú
                                     navController.navigate("vendedoraMenu")
                                 } else {
-                                    // Si hay un error mostramos un mensaje
-                                    Toast.makeText(context, "Error de autenticación. Verifica tus credenciales.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        mensaje,
+                                        "Error de autenticación. Verifica tus credenciales.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                     } else {
-                        // Mensaje si los campos están vacíos
-                        Toast.makeText(context, "Por favor, ingresa correo y contraseña", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            mensaje,
+                            "Por favor, ingresa correo y contraseña",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                )
             ) {
-                Text("INGRESAR")
+                Text("INGRESAR", color = Color.White)
             }
 
 
@@ -337,7 +474,11 @@ fun LoginScreen(navController: NavHostController, onCompradorClick: () -> Unit)
 
             Button(
                 onClick = { onCompradorClick() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                )
             ) {
                 Text("INGRESAR")
             }
@@ -356,12 +497,11 @@ data class ProductoDetalle(
     val precio: Double = 0.0,
     var stock: Int = 0,
     var cantidadReservada: Int = 0,
-    val imagenUrl: String? = null // URL de la imagen en Firebase Storage
-)
-{
-    // Constructor sin argumentos requerido en el Firestore
+    val imagenUrl: String? = null,
+    val timestamp: com.google.firebase.Timestamp? = null
+) {
     constructor() : this(
-        null, 0, "", "", "", emptyList(), 0.0, 0, 0, null
+        null, 0, "", "", "", emptyList(), 0.0, 0, 0, null, null
     )
 }
 
@@ -374,199 +514,148 @@ data class ProductoEnPedido(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BuyerScreen(navController: NavHostController, viewModel: SharedViewModel, rotacionCarrito: Float)
-{
+fun ClienteScreen(
+    navegacion: NavHostController,
+    viewModel: SharedViewModel
+) {
     val categorias = listOf(
         "Suéter", "Blusa", "Jeans", "Enterizo", "Conjunto", "Short",
-        "Falda", "Body", "Traje", "Licra", "Traje de baño", "Malla"
+        "Falda", "Body", "Traje", "Licra", "Traje de baño", "Mallas"
     )
     var busqueda by remember { mutableStateOf("") }
     var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
-    val productos = viewModel.productos.reversed()
+    val productos = viewModel.productos.sortedByDescending { it.timestamp }
     val productosFiltrados = productos.filter {
         (categoriaSeleccionada == null || it.categoria == categoriaSeleccionada) &&
                 (busqueda.isBlank() || it.referencia.contains(busqueda, ignoreCase = true))
     }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val tecladoControl = LocalSoftwareKeyboardController.current
+    val estadoPosicion = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+    val scope = rememberCoroutineScope()
+    val mostrarBotonSubir by remember {
+        derivedStateOf { estadoPosicion.firstVisibleItemIndex > 2 }
+    }
 
-    // Obtiene la ruta actual del back stack de navegación
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val volver by navegacion.currentBackStackEntryAsState()
+    val rutaActual = volver?.destination?.route
 
-
-    LaunchedEffect(currentRoute) {
-        if (currentRoute == "solicitudes") {
-            viewModel.tieneActualizacionSolicitudesComprador = false // Resetea la bandera
-            Log.d("BuyerScreen", "Cliente ha entrado a la pantalla de solicitudes. Notificación para el comprador resetada.")
+    LaunchedEffect(rutaActual) {
+        if (rutaActual == "solicitudes") {
+            viewModel.tieneActualizacionSolicitudesComprador = false
         }
     }
 
     BackHandler {
-        navController.navigate("login") {
-            popUpTo("buyer") { inclusive = true }
+        navegacion.navigate("login") {
+            popUpTo("catalogo") { inclusive = true }
         }
     }
 
     Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = currentRoute ?: "catalogo", // Pasa la ruta actual para resaltar la pestaña seleccionada
-                onCatalogoClick = {
-                    navController.navigate("buyer") {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                onCarritoClick = { navController.navigate("carrito") },
-                onSolicitudesClick = {
-                    navController.navigate("solicitudes")
-                },
-                tieneNotificacionSolicitudesComprador = viewModel.tieneActualizacionSolicitudesComprador,
-                rotacionCarrito = rotacionCarrito
-            )
-        }
+        containerColor = Color(0xFFF6F6F6)
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Logo, Buscador y Categorías
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_kiwi),
-                        contentDescription = "Logo Kiwi",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .padding(end = 12.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = busqueda,
-                        onValueChange = {
-                            if (it.matches(Regex("[a-zA-Z0-9#\\-_.]*"))) busqueda = it
-                        },
-                        label = { Text("Nº. Referencia", fontSize = 12.sp) },
-                        textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
-                        trailingIcon = {
-                            if (busqueda.isNotEmpty()) {
-                                IconButton(onClick = { busqueda = "" }) {
-                                    Icon(Icons.Default.Close, contentDescription = "Limpiar")
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = { keyboardController?.hide() }
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_kiwi),
+                            contentDescription = "Logo Kiwi",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .padding(end = 12.dp)
                         )
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(categorias) { categoria ->
-                        val seleccionado = categoria == categoriaSeleccionada
-                        Button(
-                            onClick = {
-                                categoriaSeleccionada = if (seleccionado) null else categoria
+                        OutlinedTextField(
+                            value = busqueda,
+                            onValueChange = {
+                                if (it.matches(Regex("[a-zA-Z0-9#\\-_.]*"))) busqueda = it
                             },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (seleccionado) Color.Black else Color.Gray
-                            ),
-                            modifier = Modifier.height(36.dp)
-                        ) {
-                            Text(text = categoria, color = Color.White)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Feed de productos
-            if (productosFiltrados.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay mercancía disponible", color = Color.Gray)
-                }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2), // Dos columnas fijas
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp), // Espaciado entre columnas
-                    verticalArrangement = Arrangement.spacedBy(12.dp) // Espaciado entre filas
-                ) {
-                    items(productosFiltrados, key = { it.referencia }) { producto ->
-                        Card(
-                            onClick = {
-                                navController.navigate("detalleProducto/${producto.referencia}")
+                            label = { Text("Nº. Referencia", fontSize = 12.sp) },
+                            textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                            trailingIcon = {
+                                if (busqueda.isNotEmpty()) {
+                                    IconButton(onClick = {
+                                        busqueda = ""
+                                    }) { Icon(Icons.Default.Close, contentDescription = "Limpiar") }
+                                }
                             },
                             modifier = Modifier
-                                .fillMaxWidth() // Ocupa el ancho en la celda
-                                .height(200.dp), // Altura fija para que la información no se corte
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                        ) {
-                            Column( // Contenido de la tarjeta (imagen arriba, texto abajo)
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally // Centra el contenido horizontalmente
-                            ) {
-                                if (producto.imagenUrl != null) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(producto.imagenUrl),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop, // Recorta para llenar el espacio
-                                        modifier = Modifier
-                                            .size(100.dp) // Tamaño fijo para la imagen dentro de la tarjeta
-                                            .clip(RoundedCornerShape(8.dp))
-                                    )
-                                } else {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.logo_kiwi),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(100.dp) // Tamaño fijo para la imagen dentro de la tarjeta
-                                            .clip(RoundedCornerShape(8.dp))
-                                    )
-                                }
+                                .weight(1f)
+                                .height(56.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = { tecladoControl?.hide() })
+                        )
+                    }
 
-                                Spacer(modifier = Modifier.height(8.dp)) // Espacio entre imagen y texto
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                                // Información del producto
-                                Text(producto.nombre, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-                                Text(producto.referencia, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
-                                Text("Precio: \$${String.format("%.2f", producto.precio)}", style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
-                                val stockVisible = producto.stock - producto.cantidadReservada
-                                Text(
-                                    if (stockVisible > 0) "Docenas: $stockVisible" else "Agotado",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = if (stockVisible > 0) Color.Unspecified else Color.Red,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(categorias) { categoria ->
+                            val seleccionado = categoria == categoriaSeleccionada
+                            Button(
+                                onClick = {
+                                    categoriaSeleccionada = if (seleccionado) null else categoria
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = if (seleccionado) Color.Green else Color.Black),
+                                modifier = Modifier.height(36.dp)
+                            ) { Text(text = categoria, color = Color.White) }
                         }
                     }
-                    // Espacio al final, que abarca las dos columnas
-                    item(span = { GridItemSpan(2) }) {
-                        Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                if (productosFiltrados.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No hay mercancía disponible", color = Color.Gray)
                     }
+                } else {
+                    LazyVerticalGrid(
+                        state = estadoPosicion,
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(bottom = 120.dp)
+                    ) {
+                        items(productosFiltrados, key = { it.referencia }) { producto ->
+                            ProductoCard(
+                                producto = producto,
+                                onClick = { navegacion.navigate("detalleProducto/${producto.referencia}") },
+                                esVendedor = false
+                            )
+                        }
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = mostrarBotonSubir,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 20.dp, bottom = 100.dp)
+            ) {
+                SmallFloatingActionButton(
+                    onClick = { scope.launch { estadoPosicion.animateScrollToItem(0) } },
+                    containerColor = Color.Black.copy(alpha = 0.8f),
+                    contentColor = Color.White,
+                    shape = CircleShape
+                ){
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_top),
+                        contentDescription = "Subir"
+                    )
                 }
             }
         }
@@ -575,7 +664,7 @@ fun BuyerScreen(navController: NavHostController, viewModel: SharedViewModel, ro
 
 
 @Composable
-fun BottomNavigationBar(
+fun Navegacion(
     selectedTab: String,
     onCatalogoClick: () -> Unit,
     onCarritoClick: () -> Unit,
@@ -583,47 +672,133 @@ fun BottomNavigationBar(
     tieneNotificacionSolicitudesComprador: Boolean = false,
     rotacionCarrito: Float = 0f
 ) {
-    NavigationBar {
-        NavigationBarItem(
-            selected = selectedTab == "catalogo",
-            onClick = onCatalogoClick,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Catálogo") },
-            label = { Text("Catálogo") }
+    val selectedIndex = remember(selectedTab) {
+        when (selectedTab) {
+            "catalogo" -> 0
+            "carrito" -> 1
+            "solicitudes" -> 2
+            else -> 0
+        }
+    }
+
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 24.dp)
+    ) {
+        val maxWidth = maxWidth
+        val tabWidth = maxWidth / 3
+        val indicatorOffset by animateDpAsState(
+            targetValue = tabWidth * selectedIndex,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
+            label = "indicatorAnimation"
         )
 
-        NavigationBarItem(
-            selected = selectedTab == "carrito",
-            onClick = onCarritoClick,
-            icon = {
-                Icon(
-                    Icons.Default.ShoppingCart,
-                    contentDescription = "Carrito",
-                    modifier = Modifier.graphicsLayer {
-                        rotationZ = rotacionCarrito
-                    }
-                )
-            },
-            label = { Text("Carrito") }
-        )
-
-        NavigationBarItem(
-            selected = selectedTab == "solicitudes",
-            onClick = onSolicitudesClick,
-            icon = {
-                Box {
-                    Icon(Icons.Default.List, contentDescription = "Solicitudes")
-                    if (tieneNotificacionSolicitudesComprador) {
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .offset(x = 12.dp, y = (-2).dp)
-                                .background(Color.Red, shape = CircleShape)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(65.dp)
+                .shadow(
+                    elevation = 10.dp,
+                    shape = RoundedCornerShape(50),
+                    spotColor = Color.Black.copy(alpha = 0.5f)
+                ),
+            shape = RoundedCornerShape(50),
+            color = Color.Black,
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .width(tabWidth)
+                        .fillMaxHeight()
+                        .offset(x = indicatorOffset)
+                        .padding(10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(50))
+                            .background(Color.Green)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onCatalogoClick
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Catálogo",
+                            modifier = Modifier.size(28.dp),
+                            tint = if (selectedIndex == 0) Color.Black else Color.White
                         )
                     }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onCarritoClick
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Carrito",
+                            modifier = Modifier
+                                .size(28.dp)
+                                .graphicsLayer { rotationZ = rotacionCarrito },
+                            tint = if (selectedIndex == 1) Color.Black else Color.White
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onSolicitudesClick
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box {
+                            Icon(
+                                imageVector = Icons.Default.List,
+                                contentDescription = "Solicitudes",
+                                modifier = Modifier.size(28.dp),
+                                tint = if (selectedIndex == 2) Color.Black else Color.White
+                            )
+                            if (tieneNotificacionSolicitudesComprador) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .background(Color.Red, CircleShape)
+                                        .align(Alignment.TopEnd)
+                                        .border(1.dp, Color.Black, CircleShape)
+                                )
+                            }
+                        }
+                    }
                 }
-            },
-            label = { Text("Solicitudes") }
-        )
+            }
+        }
     }
 }
 
@@ -631,22 +806,22 @@ fun BottomNavigationBar(
 @Composable
 fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
 {
-    val snackbarHostState = remember { SnackbarHostState() }
     val productosEnCarrito = viewModel.carrito.reversed()
     val total = productosEnCarrito.sumOf { it.producto?.precio?.times(it.cantidad) ?: 0.0 }
     var itemAEliminarEnCarrito by remember { mutableStateOf<com.example.kiwi.ProductoEnPedido?>(null) }
+    val mensaje = LocalContext.current
 
     BackHandler {
-        navController.navigate("buyer") {
-            popUpTo("carrito") { inclusive = true }
+        navController.navigate("catalogo") {
+            popUpTo("catalogo") { inclusive = false }
+            launchSingleTop = true
         }
     }
 
-    // Diálogo de confirmación de eliminación
     if (itemAEliminarEnCarrito != null) {
         AlertDialog(
             onDismissRequest = { itemAEliminarEnCarrito = null },
-            title = { Text("Confirmar eliminación") },
+            title = { Text("Confirmar eliminación", fontWeight = FontWeight.Bold) },
             text = {
                 val (productoDetalle, cantidad) = itemAEliminarEnCarrito!!
                 Text("¿Seguro desea eliminar ${cantidad} docenas de ${productoDetalle?.nombre} (${productoDetalle?.referencia}) del carrito?")
@@ -655,9 +830,8 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
                 TextButton(onClick = {
                     viewModel.carrito.remove(itemAEliminarEnCarrito!!)
                     itemAEliminarEnCarrito = null
-                    CoroutineScope(Dispatchers.Main).launch {
-                        snackbarHostState.showSnackbar("Producto eliminado del carrito")
-                    }
+                    Toast.makeText(mensaje, "Producto eliminado del carrito", Toast.LENGTH_SHORT)
+                        .show()
                 }) {
                     Text("Sí")
                 }
@@ -670,19 +844,7 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
         )
     }
 
-
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = "carrito",
-                onCatalogoClick = { navController.navigate("buyer") },
-                onCarritoClick = { },
-                onSolicitudesClick = { navController.navigate("solicitudes") },
-                tieneNotificacionSolicitudesComprador = viewModel.tieneActualizacionSolicitudesComprador
-            )
-        }
-    ) { padding ->
+    Scaffold(containerColor = Color(0xFFF6F6F6)) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -692,7 +854,7 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .padding(bottom = 120.dp)
+                    .padding(bottom = 100.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo_kiwi),
@@ -705,27 +867,24 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Usamos 'productosEnCarrito' para verificar si está vacío
                 if (productosEnCarrito.isEmpty()) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 120.dp),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("El carrito está vacío", style = MaterialTheme.typography.titleMedium, color = Color.Gray)
+                        Text(
+                            "El carrito está vacío",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.Gray
+                        )
                     }
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // Iterar sobre 'productosEnCarrito'
                         items(productosEnCarrito) { productoEnPedido ->
-                            // productoEnPedido es de tipo ProductoEnPedido
-                            // Destrúirlo para acceder a ProductoDetalle y cantidad
                             val (productoDetalle, cantidad) = productoEnPedido
-
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -736,10 +895,14 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
                                         .fillMaxWidth()
                                         .padding(8.dp)
                                 ) {
-                                    // Usa 'productoDetalle?.imagenUrl'
                                     if (productoDetalle?.imagenUrl != null) {
                                         Image(
-                                            painter = rememberAsyncImagePainter(productoDetalle.imagenUrl),
+                                            painter = rememberAsyncImagePainter(
+                                                model = ImageRequest.Builder(LocalContext.current)
+                                                    .data(productoDetalle.imagenUrl)
+                                                    .crossfade(true)
+                                                    .build()
+                                            ),
                                             contentDescription = null,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier
@@ -760,14 +923,19 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
                                     }
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Column(modifier = Modifier.weight(1f)) {
-                                        // Safe calls para las propiedades de productoDetalle
                                         Text(productoDetalle?.nombre ?: "Producto Desconocido")
                                         Text("Ref: ${productoDetalle?.referencia ?: "N/A"}")
                                         Text("Cantidad: $cantidad")
-                                        Text("Precio x docena: \$${String.format("%.2f", productoDetalle?.precio ?: 0.0)}")
+                                        Text(
+                                            "Precio x docena: \$${
+                                                String.format(
+                                                    "%.2f",
+                                                    productoDetalle?.precio ?: 0.0
+                                                )
+                                            }"
+                                        )
                                     }
                                     IconButton(onClick = {
-                                        //Pasar el objeto ProductoEnPedido al estado
                                         itemAEliminarEnCarrito = productoEnPedido
                                     }) {
                                         Icon(
@@ -783,14 +951,14 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
                 }
             }
 
-            // Fila fija con total + botón
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .background(Color.White)
+                    .padding(bottom = 110.dp)
+                    .background(Color.White.copy(alpha = 0.9f))
                     .padding(16.dp)
-            ) {
+            ){
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Divider()
                     Text(
@@ -798,9 +966,7 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    // Usa 'productosEnCarrito' para verificar si está vacío
                     val carritoVacio = productosEnCarrito.isEmpty()
-
                     Button(
                         onClick = {
                             if (!carritoVacio) {
@@ -810,7 +976,7 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
                         enabled = !carritoVacio,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (carritoVacio) Color.Gray else MaterialTheme.colorScheme.primary
+                            containerColor = if (carritoVacio) Color.Gray else Color.Black
                         )
                     ) {
                         Text("PEDIR", color = if (carritoVacio) Color.LightGray else Color.White)
@@ -824,18 +990,20 @@ fun CarritoScreen(navController: NavHostController, viewModel: SharedViewModel)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SolicitudesScreen(navController: NavHostController, viewModel: SharedViewModel)
-{
+fun SolicitudesScreen(navController: NavHostController, viewModel: SharedViewModel) {
     val solicitudes = viewModel.solicitudes
     var estadoSeleccionado by remember { mutableStateOf<String?>(null) }
-    val currentSortDirection by viewModel.solicitudesSortDirection.collectAsState()
+    val ordenEstandar by viewModel.solicitudesSortDirection.collectAsState()
     val solicitudesFiltradas = solicitudes
         .filter { estadoSeleccionado == null || it.estado == estadoSeleccionado }
-
+    var mostrarDialogoMotivo by remember { mutableStateOf(false) }
+    var motivoAMostrar by remember { mutableStateOf("") }
 
     BackHandler {
-        navController.navigate("buyer") {
+        navController.navigate("catalogo") {
             popUpTo("solicitudes") { inclusive = true }
+            popUpTo("catalogo") { inclusive = false }
+            launchSingleTop = true
         }
     }
 
@@ -843,128 +1011,209 @@ fun SolicitudesScreen(navController: NavHostController, viewModel: SharedViewMod
         viewModel.tieneActualizacionSolicitudesComprador = false
     }
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = "solicitudes",
-                onCatalogoClick = { navController.navigate("buyer") },
-                onCarritoClick = { navController.navigate("carrito") },
-                onSolicitudesClick = { },
-                tieneNotificacionSolicitudesComprador = viewModel.tieneActualizacionSolicitudesComprador
-            )
-        }
-    ) { padding ->
-        Column(
+    if (mostrarDialogoMotivo) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoMotivo = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Motivo de devolución", fontWeight = FontWeight.Bold)
+                }
+            },
+            text = {
+                Text(
+                    text = if (motivoAMostrar.isNotBlank()) motivoAMostrar else "No se especificó un motivo detallado.",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { mostrarDialogoMotivo = false }) {
+                    Text("Entendido")
+                }
+            }
+        )
+    }
+
+    Scaffold(containerColor = Color(0xFFF6F6F6)) { padding ->
+
+        Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                // Logo
-                Spacer(modifier = Modifier.height(12.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.logo_kiwi),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_kiwi),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    val estados = listOf("Aceptada", "Pendiente", "Devuelta")
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(estados) { estado ->
+                            val activo = estado == estadoSeleccionado
+                            val colorFondo = if (activo) {
+                                when (estado) {
+                                    "Aceptada" -> Color(0xFF2E7D32)
+                                    "Pendiente" -> Color(0xFFF9A825)
+                                    "Devuelta" -> Color(0xFFD32F2F)
+                                    else -> Color.Black
+                                }
+                            } else {
+                                Color.Black
+                            }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { estadoSeleccionado = if (activo) null else estado },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = colorFondo,
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(50),
+                                modifier = Modifier
+                                    .padding(horizontal = 4.dp)
+                                    .height(36.dp),
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp)
+                            ) {
+                                Text(text = estado, fontSize = 13.sp)
+                            }
+                        }
+                    }
 
-                // Filtros de estado (Aceptada, Pendiente, Rechazada)
-                val estados = listOf("Aceptada", "Pendiente", "Devuelta")
-                LazyRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
-                {
-                    items(estados) { estado ->
-                        val activo = estado == estadoSeleccionado
-                        FilterChip(
-                            selected = activo,
-                            onClick = {
-                                estadoSeleccionado = if (activo) null else estado
-                            },
-                            label = { Text(estado) },
-                            modifier = Modifier.padding(horizontal = 4.dp)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Ordenar por fecha:", modifier = Modifier.weight(1f))
+                        Ordenamiento(
+                            ordenAscendente = ordenEstandar == Query.Direction.ASCENDING,
+                            onOrdenChange = { nuevoOrden ->
+                                val direccion =
+                                    if (nuevoOrden) Query.Direction.ASCENDING else Query.Direction.DESCENDING
+                                viewModel.setSolicitudesSortDirection(direccion)
+                            }
                         )
                     }
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Selector de orden por fecha
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Ordenar por fecha:", modifier = Modifier.weight(1f))
-                    // Conecta el DropdownMenuBox con el ViewModel
-                    DropdownMenuBox(
-                        ordenAscendente = currentSortDirection == Query.Direction.ASCENDING,
-                        onOrdenChange = { nuevoOrden ->
-                            val direction = if (nuevoOrden) Query.Direction.ASCENDING else Query.Direction.DESCENDING
-                            viewModel.setSolicitudesSortDirection(direction)
-                        }
-                    )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-
-            // Lista de solicitudes
-            if (solicitudesFiltradas.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay solicitudes registradas", color = Color.Gray)
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    items(solicitudesFiltradas) { solicitud ->
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            elevation = CardDefaults.cardElevation(4.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                if (solicitudesFiltradas.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No hay solicitudes registradas", color = Color.Gray)
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        contentPadding = PaddingValues(bottom = 120.dp)
+                    ) {
+                        items(solicitudesFiltradas) { solicitud ->
+                            val context = LocalContext.current
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(4.dp)
                             ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    solicitud.productos.forEach { (productoDetalle, cantidadPedida) ->
-
-                                        val referencia = productoDetalle?.referencia
-                                        val nombreProducto = productoDetalle?.nombre
-                                        val precioUnitario = productoDetalle?.precio
-
-                                        Text("Prenda: ${nombreProducto ?: "Desconocido"}", style = MaterialTheme.typography.bodyMedium)
-                                        Text("Referencia: ${referencia ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
-                                        Text("Docenas: $cantidadPedida", style = MaterialTheme.typography.bodyMedium)
-                                        Text("Precio x Docena: \$%.2f".format(precioUnitario ?: 0.0), style = MaterialTheme.typography.bodyMedium)
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        solicitud.productos.forEach { (productoDetalle, cantidadPedida) ->
+                                            val nombre = productoDetalle?.nombre ?: "Desconocido"
+                                            val ref = productoDetalle?.referencia ?: "N/A"
+                                            Text(
+                                                "Prenda: $nombre",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                "Referencia: $ref",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                "Docenas: $cantidadPedida",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                "Precio x Docena: \$%.2f".format(
+                                                    productoDetalle?.precio ?: 0.0
+                                                ), style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                        }
+                                        Text(
+                                            "Total: \$${String.format("%.2f", solicitud.total)}",
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            "Fecha: ${solicitud.fecha} ${solicitud.hora}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
                                     }
-                                    Text("Total: \$${String.format("%.2f", solicitud.total)}", fontWeight = FontWeight.Bold)
-                                    Text("Fecha: ${solicitud.fecha} ${solicitud.hora}", style = MaterialTheme.typography.bodyMedium)
-                                }
 
-                                // Estado a la derecha
-                                Text(
-                                    text = solicitud.estado,
-                                    color = when (solicitud.estado) {
-                                        "Aceptada" -> Color(0xFF2E7D32)
-                                        "Pendiente" -> Color(0xFFF9A825)
-                                        "Devuelta" -> Color(0xFFD32F2F)
-                                        else -> Color.Gray
-                                    },
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 12.dp)
-                                )
+                                    Column(
+                                        horizontalAlignment = Alignment.End,
+                                        modifier = Modifier.padding(start = 12.dp)
+                                    ) {
+                                        Text(
+                                            text = solicitud.estado,
+                                            color = when (solicitud.estado) {
+                                                "Aceptada" -> Color(0xFF2E7D32)
+                                                "Pendiente" -> Color(0xFFF9A825)
+                                                "Devuelta" -> Color(0xFFD32F2F)
+                                                else -> Color.Gray
+                                            },
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(bottom = 8.dp)
+                                        )
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        if (solicitud.estado == "Aceptada") {
+                                            IconButton(onClick = {
+                                                com.example.kiwi.utils.PdfGenerator(
+                                                    context
+                                                ).generarFactura(solicitud)
+                                            }) {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_descarga_pdf),
+                                                    contentDescription = "Descargar Comprobante",
+                                                    tint = Color.Black,
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                            }
+                                            Text("Comprobante", fontSize = 9.sp, color = Color.Gray)
+
+                                        } else if (solicitud.estado == "Devuelta") {
+                                            IconButton(onClick = {
+                                                motivoAMostrar = solicitud.motivoRechazo
+                                                mostrarDialogoMotivo = true
+                                            }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Info,
+                                                    contentDescription = "Ver Motivo",
+                                                    tint = Color(0xFFD32F2F),
+                                                    modifier = Modifier.size(28.dp)
+                                                )
+                                            }
+                                            Text("Ver motivo", fontSize = 9.sp, color = Color.Gray)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -976,28 +1225,32 @@ fun SolicitudesScreen(navController: NavHostController, viewModel: SharedViewMod
 
 
 @Composable
-fun DropdownMenuBox(
+fun Ordenamiento(
     ordenAscendente: Boolean,
     onOrdenChange: (Boolean) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
+    var expandida by remember { mutableStateOf(false) }
     Box {
-        Button(onClick = { expanded = true }) {
+        Button(onClick = { expandida = true },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black,
+                contentColor = Color.White
+            )
+        ) {
             Text(if (ordenAscendente) "Ascendente" else "Descendente")
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(expanded = expandida, onDismissRequest = { expandida = false }) {
             DropdownMenuItem(
                 text = { Text("Ascendente") },
                 onClick = {
-                    expanded = false
+                    expandida = false
                     if (!ordenAscendente) onOrdenChange(true)
                 }
             )
             DropdownMenuItem(
                 text = { Text("Descendente") },
                 onClick = {
-                    expanded = false
+                    expandida = false
                     if (ordenAscendente) onOrdenChange(false)
                 }
             )
@@ -1010,7 +1263,7 @@ fun DropdownMenuBox(
 @Composable
 fun DetalleProductoScreen(
     productoId: String,
-    navController: NavHostController,
+    navegacion: NavHostController,
     viewModel: SharedViewModel,
     rotarCarrito: MutableState<Boolean>,
     rotacionCarrito: Float
@@ -1022,33 +1275,28 @@ fun DetalleProductoScreen(
         }
         return
     }
-
     var tipoTallaSeleccionada by remember { mutableStateOf<String?>(null) }
     var cantidadTexto by remember { mutableStateOf("") }
     var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
     var imagenAmpliada by remember { mutableStateOf(false) }
     val composableScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val mensaje = LocalContext.current
+    var botonExitoso by remember { mutableStateOf(false) }
 
     BackHandler {
-        navController.navigate("buyer") {
-            popUpTo("detalleProducto/${productoId}") { inclusive = true }
-        }
+        navegacion.popBackStack()
     }
 
-    // Box como contenedor principal para poder apilar elementos
     Box(modifier = Modifier.fillMaxSize()) {
-
-        // Contenido principal de la pantalla que se puede desplazar
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // Padding inferior para que el contenido no quede oculto detrás de los elementos flotantes
-                .padding(bottom = 150.dp)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 150.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(4.dp))
             Image(
                 painter = painterResource(id = R.drawable.logo_kiwi),
                 contentDescription = "Logo Kiwi",
@@ -1057,14 +1305,32 @@ fun DetalleProductoScreen(
                     .padding(8.dp)
                     .align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(producto.nombre, style = MaterialTheme.typography.titleLarge)
-            Text(producto.referencia, style = MaterialTheme.typography.titleMedium)
+
+            Spacer(modifier = Modifier.height(0.dp))
+
+            Text(
+                text = producto.nombre,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = producto.referencia,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+
             Spacer(modifier = Modifier.height(12.dp))
 
             if (producto.imagenUrl != null) {
                 Image(
-                    painter = rememberAsyncImagePainter(producto.imagenUrl),
+                    painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(producto.imagenUrl)
+                            .crossfade(true)
+                            .build()
+                    ),
                     contentDescription = null,
                     modifier = Modifier
                         .size(200.dp)
@@ -1112,7 +1378,11 @@ fun DetalleProductoScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             if (tipoTallaSeleccionada == null) {
-                Text("Seleccione una talla", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                Text(
+                    "Seleccione una talla",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -1138,7 +1408,10 @@ fun DetalleProductoScreen(
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Precio x Docena", style = MaterialTheme.typography.labelLarge)
-                    Text("\$${String.format("%.2f", producto.precio)}", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "\$${String.format("%.2f", producto.precio)}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
 
@@ -1159,12 +1432,18 @@ fun DetalleProductoScreen(
             )
         }
 
-        // Botón flotante anclado en la parte inferior y central
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 90.dp) // Sube el botón para que quede encima de la barra de navegación
+                .padding(bottom = 90.dp)
         ) {
+
+            val colorFondo by animateColorAsState(
+                targetValue = if (botonExitoso) Color.Green else Color.Black,
+                label = "color",
+                animationSpec = tween(durationMillis = 500)
+            )
+
             ExtendedFloatingActionButton(
                 onClick = {
                     val cantidadFinal = cantidadTexto.toIntOrNull() ?: 0
@@ -1173,71 +1452,135 @@ fun DetalleProductoScreen(
                     val cantidadInvalida = cantidadTexto.isBlank() || cantidadFinal <= 0
 
                     when {
-                        sinTalla && cantidadInvalida -> Toast.makeText(context, "Seleccione una talla y agregue una cantidad", Toast.LENGTH_SHORT).show()
-                        sinTalla -> Toast.makeText(context, "Seleccione una talla", Toast.LENGTH_SHORT).show()
-                        cantidadInvalida -> Toast.makeText(context, "Agregue la cantidad que desea", Toast.LENGTH_SHORT).show()
-                        cantidadFinal > stockRealmenteDisponible -> Toast.makeText(context, "No hay suficientes docenas disponibles (${stockRealmenteDisponible} restantes).", Toast.LENGTH_LONG).show()
+                        sinTalla && cantidadInvalida -> Toast.makeText(
+                            mensaje,
+                            "Seleccione una talla y agregue una cantidad",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        sinTalla -> Toast.makeText(
+                            mensaje,
+                            "Seleccione una talla",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        cantidadInvalida -> Toast.makeText(
+                            mensaje,
+                            "Agregue la cantidad que desea",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        cantidadFinal > stockRealmenteDisponible -> Toast.makeText(
+                            mensaje,
+                            "No hay suficientes docenas disponibles (${stockRealmenteDisponible} restantes).",
+                            Toast.LENGTH_LONG
+                        ).show()
+
                         else -> {
                             if ((producto.stock - producto.cantidadReservada) > 0) {
                                 viewModel.agregarAlCarrito(producto, cantidadFinal)
                                 cantidadTexto = ""
                                 tipoTallaSeleccionada = null
-                                mostrarDialogoConfirmacion = true
+                                botonExitoso = true
 
                                 composableScope.launch {
-                                    delay(2500)
                                     rotarCarrito.value = true
+                                    delay(2000)
+                                    botonExitoso = false
                                 }
                             }
                         }
                     }
                 },
-                containerColor = Color.Black,
+                containerColor = colorFondo,
                 contentColor = Color.White
             ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = "Agregar al Carrito",
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text("Agregar al carrito")
+                AnimatedContent(targetState = botonExitoso, label = "icono") { esExito ->
+                    if (esExito) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("¡Agregado!", fontWeight = FontWeight.Bold)
+                        }
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Agregar al carrito")
+                        }
+                    }
+                }
             }
-        }
-
-        // Barra de navegación inferior
-        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-            BottomNavigationBar(
-                selectedTab = "catalogo",
-                onCatalogoClick = { navController.navigate("buyer") },
-                onCarritoClick = { navController.navigate("carrito") },
-                onSolicitudesClick = { navController.navigate("solicitudes") },
-                tieneNotificacionSolicitudesComprador = viewModel.tieneActualizacionSolicitudesComprador,
-                rotacionCarrito = rotacionCarrito
-            )
         }
     }
 
-    // Diálogos que se muestran sobre toda la pantalla
     if (imagenAmpliada) {
         Dialog(
             onDismissRequest = { imagenAmpliada = false },
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+            properties = androidx.compose.ui.window.DialogProperties(
+                usePlatformDefaultWidth = false
+            )
         ) {
+            var escalaImg by remember { mutableStateOf(1f) }
+            var achicarImg by remember { mutableStateOf(Offset.Zero) }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black),
-                contentAlignment = Alignment.Center
+                    .background(Color.Black)
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zoom, _ ->
+                            escalaImg = (escalaImg * zoom).coerceIn(1f, 4f)
+                            if (escalaImg > 1f) {
+                                val volverAchicar = achicarImg + pan
+                                achicarImg = volverAchicar
+                            } else {
+                                achicarImg = Offset.Zero
+                            }
+                        }
+                    }
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onDoubleTap = {
+                                if (escalaImg > 1f) {
+                                    escalaImg = 1f
+                                    achicarImg = Offset.Zero
+                                } else {
+                                    escalaImg = 2f
+                                }
+                            },
+                        )
+                    }
             ) {
-                val painter = producto.imagenUrl?.let { rememberAsyncImagePainter(it) } ?: painterResource(id = R.drawable.logo_kiwi)
+                IconButton(
+                    onClick = { imagenAmpliada = false },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                        .zIndex(2f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cerrar",
+                        tint = Color.White
+                    )
+                }
+
+                val painter = producto.imagenUrl?.let { rememberAsyncImagePainter(it) }
+                    ?: painterResource(id = R.drawable.logo_kiwi)
+
                 Image(
                     painter = painter,
                     contentDescription = null,
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.8f)
-                        .clickable { imagenAmpliada = false },
-                    contentScale = ContentScale.Fit
+                        .fillMaxSize()
+                        .graphicsLayer(
+                            scaleX = escalaImg,
+                            scaleY = escalaImg,
+                            translationX = achicarImg.x,
+                            translationY = achicarImg.y
+                        )
                 )
             }
         }
@@ -1250,8 +1593,8 @@ fun DetalleProductoScreen(
                 dismissOnBackPress = false,
                 dismissOnClickOutside = false
             ),
-            title = { Text("Mercancía agregada") },
-            text = { Text("Tu mercancía ha sido agregada al carrito") },
+            title = { Text("Mercancía agregada", fontWeight = FontWeight.Bold) },
+            text = { Text("Su mercancía ha sido agregada al carrito") },
             confirmButton = {}
         )
 
@@ -1264,13 +1607,13 @@ fun DetalleProductoScreen(
 
 
 @Composable
-fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) {
+fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel)
+{
     val nombre = remember { mutableStateOf("") }
     val celular = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
-    val estadoActualPedido = viewModel.estadoPedido
+    val tecladoControl = LocalSoftwareKeyboardController.current
+    val mensaje = LocalContext.current
     var mensajeError by remember { mutableStateOf<String?>(null) }
 
 
@@ -1278,38 +1621,40 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
         is EstadoPedido.Success -> {
             AlertDialog(
                 onDismissRequest = { },
-                title = { Text("Pedido enviado") },
+                properties = androidx.compose.ui.window.DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false
+                ),
+                title = { Text("Pedido enviado", fontWeight = FontWeight.Bold) },
                 text = { Text("Su pedido ha sido enviado con éxito y será revisado por la vendedora.") },
                 confirmButton = { }
             )
             LaunchedEffect(Unit) {
                 delay(2000)
                 viewModel.resetEstadoPedido()
-                navController.navigate("buyer") {
+                navController.navigate("catalogo") {
                     popUpTo("FacturaScreen") { inclusive = true }
                 }
             }
         }
+
         is EstadoPedido.Conflict -> {
             val conflicto = estado.info
             AlertDialog(
                 onDismissRequest = { viewModel.resetEstadoPedido() },
-                title = { Text("Inventario insuficiente") },
+                title = { Text("Inventario insuficiente", fontWeight = FontWeight.Bold) },
                 text = {
-                    // CAMBIO 1: Formato "Nombre - Referencia"
-                    // Usamos un salto de linea (\n) para que se vea ordenado si son varios
-                    val listaProductos = conflicto.productosAgotados.joinToString(separator = "\n") { item ->
-                        "${item.producto?.nombre ?: "Sin nombre"} - ${item.producto?.referencia ?: "N/A"}"
-                    }
+                    val listaProductos =
+                        conflicto.productosAgotados.joinToString(separator = "\n") { item ->
+                            "${item.producto?.nombre ?: "Sin nombre"} - ${item.producto?.referencia ?: "N/A"}"
+                        }
                     Text("Productos agotados:\n\n$listaProductos")
                 },
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            // CAMBIO 2: Navegar al carrito para editar
-                            viewModel.resetEstadoPedido() // Limpia el error
+                            viewModel.resetEstadoPedido()
                             navController.navigate("carrito") {
-                                // Opcional: Esto ayuda a que no se duplique la pantalla del carrito
                                 popUpTo("carrito") { inclusive = true }
                             }
                         }
@@ -1319,7 +1664,7 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
                 }
             )
         }
-        // CASO 1: Mostrar indicador de carga
+
         is EstadoPedido.Loading -> {
             Dialog(onDismissRequest = {}) {
                 Box(
@@ -1332,24 +1677,22 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
                 }
             }
         }
-        // CASO 2: Manejar el error
+
         is EstadoPedido.Failure -> {
-            // Guardamos el error para mostrarlo en un diálogo
             LaunchedEffect(estado) {
                 mensajeError = estado.error
             }
         }
-        else -> { }
+        else -> {}
     }
 
-    // Diálogo para mostrar errores si ocurren
     if (mensajeError != null) {
         AlertDialog(
             onDismissRequest = {
                 viewModel.resetEstadoPedido()
                 mensajeError = null
             },
-            title = { Text("Error") },
+            title = { Text("Error", fontWeight = FontWeight.Bold) },
             text = { Text(mensajeError ?: "Error desconocido") },
             confirmButton = {
                 TextButton(onClick = {
@@ -1362,38 +1705,34 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
         )
     }
 
-
-
     Box(modifier = Modifier.fillMaxSize()) {
-
-        // Barra de navegación inferior
-        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-            BottomNavigationBar(
-                selectedTab = "factura",
-                onCatalogoClick = { navController.navigate("buyer") },
-                onCarritoClick = { navController.navigate("carrito") },
-                onSolicitudesClick = { navController.navigate("solicitudes") }
-            )
-        }
-
-        // Contenido principal de la pantalla
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 150.dp)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(bottom = 150.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_kiwi),
                 contentDescription = "Logo Kiwi",
-                modifier = Modifier.size(80.dp).padding(8.dp)
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(8.dp)
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text("Datos para factura no fiscal", style = MaterialTheme.typography.headlineLarge)
+
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Coloque sus datos para enviar a su correo la factura de compra", style = MaterialTheme.typography.bodyMedium)
+
+            Text(
+                "Coloque sus datos para generar su comprobante de mercancía",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
@@ -1401,7 +1740,7 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
                 onValueChange = {
                     if (it.matches(Regex("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]*"))) nombre.value = it
                 },
-                label = { Text("Nombre") },
+                label = { Text("Nombre y Apellido") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
@@ -1415,7 +1754,10 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
                 label = { Text("Celular") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                )
             )
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
@@ -1424,16 +1766,17 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { tecladoControl?.hide() })
             )
         }
-
-        // Botón flotante "Enviar"
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 90.dp)
+                .padding(bottom = 120.dp)
         ) {
             ExtendedFloatingActionButton(
                 onClick = {
@@ -1441,17 +1784,21 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
                     val celularLleno = celular.value.isNotBlank()
                     val emailLleno = email.value.isNotBlank()
 
-                    val nombreFormatoValido = nombre.value.matches(Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+\$"))
+                    val nombreFormatoValido =
+                        nombre.value.matches(Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+\$"))
                     val celularFormatoValido = celular.value.matches(Regex("^\\+?\\d{8,15}\$"))
-                    val emailFormatoValido = email.value.endsWith("@gmail.com") || email.value.endsWith("@outlook.com")
+                    val emailFormatoValido =
+                        email.value.endsWith("@gmail.com") || email.value.endsWith("@outlook.com") || email.value.endsWith(
+                            "@hotmail.com"
+                        ) || email.value.endsWith("@icloud.com") || email.value.endsWith("@yahoo.com")
 
                     when {
-                        !nombreLleno -> Toast.makeText(context, "Introduzca su nombre", Toast.LENGTH_SHORT).show()
-                        !celularLleno -> Toast.makeText(context, "Introduzca su celular", Toast.LENGTH_SHORT).show()
-                        !emailLleno -> Toast.makeText(context, "Introduzca su email", Toast.LENGTH_SHORT).show()
-                        !nombreFormatoValido -> Toast.makeText(context, "El nombre solo debe contener letras", Toast.LENGTH_SHORT).show()
-                        !celularFormatoValido -> Toast.makeText(context, "El celular debe tener entre 8 y 15 dígitos", Toast.LENGTH_SHORT).show()
-                        !emailFormatoValido -> Toast.makeText(context, "El email debe ser @gmail.com o @outlook.com", Toast.LENGTH_SHORT).show()
+                        !nombreLleno -> Toast.makeText(mensaje, "Introduzca su nombre", Toast.LENGTH_SHORT).show()
+                        !celularLleno -> Toast.makeText(mensaje, "Introduzca su celular", Toast.LENGTH_SHORT).show()
+                        !emailLleno -> Toast.makeText(mensaje, "Introduzca su email", Toast.LENGTH_SHORT).show()
+                        !nombreFormatoValido -> Toast.makeText(mensaje, "El nombre solo debe contener letras", Toast.LENGTH_SHORT).show()
+                        !celularFormatoValido -> Toast.makeText(mensaje, "El celular debe tener entre 8 y 15 dígitos", Toast.LENGTH_SHORT).show()
+                        !emailFormatoValido -> Toast.makeText(mensaje, "El email debe ser uno válido", Toast.LENGTH_SHORT).show()
                         else -> {
                             viewModel.realizarPedido(
                                 nombre = nombre.value,
@@ -1475,6 +1822,7 @@ fun FacturaScreen(navController: NavHostController, viewModel: SharedViewModel) 
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VendedoraMenuScreen(navController: NavHostController, viewModel: SharedViewModel)
 {
@@ -1482,19 +1830,21 @@ fun VendedoraMenuScreen(navController: NavHostController, viewModel: SharedViewM
         "Suéter", "Blusa", "Jeans", "Enterizo", "Conjunto", "Short",
         "Falda", "Body", "Traje", "Licra", "Traje de baño", "Mallas"
     )
-
     var productoAEliminar by remember { mutableStateOf<ProductoDetalle?>(null) }
-    val snackbarHostState = remember { SnackbarHostState() }
     var busqueda by remember { mutableStateOf("") }
     var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
-    val productos = viewModel.productos.reversed()
+    val productos = viewModel.productos.sortedByDescending { it.timestamp }
     val productosFiltrados = productos.filter {
         (categoriaSeleccionada == null || it.categoria == categoriaSeleccionada) &&
                 (busqueda.isBlank() || it.referencia.contains(busqueda, ignoreCase = true))
     }
-    val listState = rememberLazyListState()
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
+    val estadoPosicion = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    val mostrarBotonSubir by remember {
+        derivedStateOf { estadoPosicion.firstVisibleItemIndex > 2 }
+    }
+    val tecladoControl = LocalSoftwareKeyboardController.current
+    val mensaje = LocalContext.current
 
     BackHandler {
         navController.navigate("login") {
@@ -1505,7 +1855,7 @@ fun VendedoraMenuScreen(navController: NavHostController, viewModel: SharedViewM
     if (productoAEliminar != null) {
         AlertDialog(
             onDismissRequest = { productoAEliminar = null },
-            title = { Text("Confirmar eliminación") },
+            title = { Text("Confirmar eliminación", fontWeight = FontWeight.Bold) },
             text = { Text("¿Seguro desea eliminar el producto '${productoAEliminar!!.nombre}'?") },
             confirmButton = {
                 TextButton(onClick = {
@@ -1513,239 +1863,182 @@ fun VendedoraMenuScreen(navController: NavHostController, viewModel: SharedViewM
                         producto = productoAEliminar!!,
                         onSuccess = {
                             productoAEliminar = null
-                            Toast.makeText(context, "Producto eliminado exitosamente", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                mensaje,
+                                "Producto eliminado exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         },
                         onFailure = { e ->
-                            // Para mi: Imprime el error detallado en el Logcat para que sepas qué pasó.
                             Log.e("VendedoraMenu", "Error al eliminar producto", e)
-
-                            // Para el usuario: Muestra un mensaje amigable y genérico.
                             productoAEliminar = null
-                            Toast.makeText(context, "No se pudo eliminar el producto. Inténtalo de nuevo.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                mensaje,
+                                "No se pudo eliminar el producto.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     )
-                }) {
-                    Text("Sí")
-                }
+                }) { Text("Sí") }
             },
-            dismissButton = {
-                TextButton(onClick = { productoAEliminar = null }) {
-                    Text("No")
-                }
-            }
+            dismissButton = { TextButton(onClick = { productoAEliminar = null }) { Text("No") } }
         )
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = Color(0xFFF6F6F6),
         floatingActionButton = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                // Botón de solicitudes con globo animado
                 Box {
                     FloatingActionButton(
                         onClick = {
                             viewModel.tieneSolicitudesNuevas = false
                             navController.navigate("vendedoraSolicitudes")
-                        }
-                    ) {
-                        Icon(Icons.Default.List, contentDescription = "Solicitudes")
-                    }
+                        },
+                        containerColor = Color.Black,
+                        contentColor = Color.White
+                    ) { Icon(Icons.Default.List, contentDescription = "Solicitudes") }
 
                     if (viewModel.tieneSolicitudesNuevas) {
                         var saltoPorPx by remember { mutableStateOf(0.dp) }
                         val animacionSalto by animateDpAsState(
                             targetValue = saltoPorPx,
-                            label = "AnimacionGlobo"
+                            label = "AnimacionGlobo",
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(300),
+                                repeatMode = RepeatMode.Reverse
+                            )
                         )
-
-                        LaunchedEffect(viewModel.tieneSolicitudesNuevas) {
-                            while (viewModel.tieneSolicitudesNuevas) {
-                                saltoPorPx = 6.dp
-                                delay(300)
-                                saltoPorPx = 0.dp
-                                delay(300)
-                            }
-                        }
-
+                        LaunchedEffect(viewModel.tieneSolicitudesNuevas) { saltoPorPx = 6.dp }
                         Box(
                             modifier = Modifier
                                 .size(18.dp)
                                 .align(Alignment.TopEnd)
                                 .offset(x = 4.dp, y = (-4).dp - animacionSalto)
-                                .background(Color.Red, shape = CircleShape)
+                                .background(Color.Green, shape = CircleShape)
                         )
                     }
                 }
-
-                // Botón de agregar mercancía
-                FloatingActionButton(
-                    onClick = { navController.navigate("agregarProducto") },
+                FloatingActionButton(onClick = { navController.navigate("agregarProducto") },
+                    containerColor = Color.Black,
+                    contentColor = Color.White
                 ) {
-                    Text("   + AGREGAR MERCANCIA   ", color = Color.DarkGray)
+                    Text("   + AGREGAR MERCANCIA   ")
                 }
             }
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // LOGO + BUSCADOR + CATEGORÍAS
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_kiwi),
-                        contentDescription = "Logo Kiwi",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .padding(end = 12.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = busqueda,
-                        onValueChange = {
-                            if (it.matches(Regex("[a-zA-Z0-9#\\-_.]*"))) busqueda = it
-                        },
-                        label = { Text("Nº. Referencia", fontSize = 12.sp) },
-                        textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
-                        trailingIcon = {
-                            if (busqueda.isNotEmpty()) {
-                                IconButton(onClick = { busqueda = "" }) {
-                                    Icon(Icons.Default.Close, contentDescription = "Limpiar")
-                                }
-                            }
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = { keyboardController?.hide() }
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(categorias) { categoria ->
-                        val seleccionado = categoria == categoriaSeleccionada
-                        Button(
-                            onClick = {
-                                categoriaSeleccionada = if (seleccionado) null else categoria
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (seleccionado) Color.Black else Color.Gray
-                            ),
-                            modifier = Modifier.height(36.dp)
-                        ) {
-                            Text(text = categoria, color = Color.White)
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // FEED DE PRODUCTOS
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                if (productosFiltrados.isEmpty()) {
-                    item {
-                        Box(
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_kiwi),
+                            contentDescription = "Logo Kiwi",
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("No hay mercancía disponible", color = Color.Gray)
+                                .size(50.dp)
+                                .padding(end = 12.dp)
+                        )
+                        OutlinedTextField(
+                            value = busqueda,
+                            onValueChange = {
+                                if (it.matches(Regex("[a-zA-Z0-9#\\-_.]*"))) busqueda = it
+                            },
+                            label = { Text("Nº. Referencia", fontSize = 12.sp) },
+                            textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                            trailingIcon = {
+                                if (busqueda.isNotEmpty()) {
+                                    IconButton(onClick = {
+                                        busqueda = ""
+                                    }) { Icon(Icons.Default.Close, contentDescription = "Limpiar") }
+                                }
+                            },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(onDone = { tecladoControl?.hide() }),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(categorias) { categoria ->
+                            val seleccionado = categoria == categoriaSeleccionada
+                            Button(
+                                onClick = {
+                                    categoriaSeleccionada = if (seleccionado) null else categoria
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = if (seleccionado) Color.Green else Color.Black),
+                                modifier = Modifier.height(36.dp)
+                            ) { Text(text = categoria, color = Color.White) }
                         }
                     }
-                } else {
-                    items(productosFiltrados) { producto ->
-                        Card(
-                            // Al hacer clic en la tarjeta, navegar a la pantalla de edición
-                            onClick = {
-                                navController.navigate("editarProducto/${producto.referencia}")
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                LazyColumn(
+                    state = estadoPosicion,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    if (productosFiltrados.isEmpty()) {
+                        item {
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(12.dp)
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                val imagenPainter = producto.imagenUrl?.let {
-                                    rememberAsyncImagePainter(it)
-                                }
-
-                                if (imagenPainter != null) {
-                                    Image(
-                                        painter = imagenPainter,
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(100.dp)
-                                            .padding(end = 16.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                    )
-                                } else {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.logo_kiwi),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(100.dp)
-                                            .padding(end = 16.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                    )
-                                }
-
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
-                                    Text(producto.referencia, style = MaterialTheme.typography.bodySmall)
-                                    Text("Precio: \$${String.format("%.2f", producto.precio)}", style = MaterialTheme.typography.bodySmall)
-                                    val stockVisible = producto.stock - producto.cantidadReservada
-                                    Text(
-                                        if (stockVisible > 0) "Docenas: $stockVisible" else "Agotado",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = if (stockVisible > 0) Color.Unspecified else Color.Red
-                                    )
-                                }
-
-                                IconButton(onClick = {
-                                    productoAEliminar = producto
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "Eliminar producto",
-                                        tint = Color.Red
-                                    )
-                                }
+                                Text("No hay mercancía disponible", color = Color.Gray)
                             }
                         }
+                    } else {
+                        items(productosFiltrados) { producto ->
+                            ProductoCard(
+                                producto = producto,
+                                onClick = { navController.navigate("editarProducto/${producto.referencia}") },
+                                esVendedor = true,
+                                onDeleteClick = { productoAEliminar = producto }
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(140.dp)) }
                     }
-
-                    item {
-                        Spacer(modifier = Modifier.height(140.dp))
-                    }
+                }
+            }
+            AnimatedVisibility(
+                visible = mostrarBotonSubir,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 20.dp, bottom = 20.dp)
+            ) {
+                SmallFloatingActionButton(
+                    onClick = { scope.launch { estadoPosicion.animateScrollToItem(0) } },
+                    containerColor = Color.Black.copy(alpha = 0.8f),
+                    contentColor = Color.White,
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_top),
+                        contentDescription = "Subir"
+                    )
                 }
             }
         }
@@ -1755,39 +2048,45 @@ fun VendedoraMenuScreen(navController: NavHostController, viewModel: SharedViewM
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedViewModel)
-{
+fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedViewModel) {
     val nombre = remember { mutableStateOf("") }
     val referencia = remember { mutableStateOf("") }
     val categoria = remember { mutableStateOf("") }
-    val categoriasDisponibles = listOf("Suéter", "Blusa", "Jeans", "Enterizo", "Conjunto", "Short", "Falda", "Body", "Traje", "Licra", "Traje de baño", "Mallas")
+    val categoriasDisponibles = listOf(
+        "Suéter",
+        "Blusa",
+        "Jeans",
+        "Enterizo",
+        "Conjunto",
+        "Short",
+        "Falda",
+        "Body",
+        "Traje",
+        "Licra",
+        "Traje de baño",
+        "Mallas"
+    )
     val docena = remember { mutableStateOf("") }
     val precio = remember { mutableStateOf("") }
-    val snackbarHostState = remember { SnackbarHostState() }
-
     val tallasAgregadas = remember { mutableStateListOf<String>() }
     var nuevaTallaInput by remember { mutableStateOf("") }
-
-    val context = LocalContext.current
-    var imagenUri: Uri? by remember { mutableStateOf(null) } // La URI local seleccionada
+    val mensaje = LocalContext.current
+    var imagenUri: Uri? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imagenUri = uri
     }
 
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val tecladoControl = LocalSoftwareKeyboardController.current
     var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
+    var estaCargando by remember { mutableStateOf(false) }
 
     BackHandler {
-        navController.navigate("vendedoraMenu") {
-            popUpTo("agregarProducto") { inclusive = true }
-        }
+        navController.popBackStack()
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+    Scaffold(containerColor = Color(0xFFF6F6F6),
         topBar = {
             TopAppBar(
                 title = {
@@ -1847,7 +2146,7 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = { keyboardController?.hide() }
+                        onDone = { tecladoControl?.hide() }
                     )
                 )
 
@@ -1866,18 +2165,18 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = { keyboardController?.hide() }
+                        onDone = { tecladoControl?.hide() }
                     )
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val interactionSource = remember { MutableInteractionSource() }
-                val isPressed by interactionSource.collectIsPressedAsState()
-                var expandedCategoriaDropdown by remember { mutableStateOf(false) }
+                val interaccion = remember { MutableInteractionSource() }
+                val esPresionado by interaccion.collectIsPressedAsState()
+                var expansionCategoria by remember { mutableStateOf(false) }
 
-                LaunchedEffect(isPressed) {
-                    if (isPressed) expandedCategoriaDropdown = true
+                LaunchedEffect(esPresionado) {
+                    if (esPresionado) expansionCategoria = true
                 }
 
                 OutlinedTextField(
@@ -1889,13 +2188,13 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                     trailingIcon = {
                         Icon(Icons.Default.ArrowDropDown, contentDescription = "Expandir")
                     },
-                    interactionSource = interactionSource,
+                    interactionSource = interaccion,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 DropdownMenu(
-                    expanded = expandedCategoriaDropdown,
-                    onDismissRequest = { expandedCategoriaDropdown = false },
+                    expanded = expansionCategoria,
+                    onDismissRequest = { expansionCategoria = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     categoriasDisponibles.forEach { opcion ->
@@ -1903,7 +2202,7 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                             text = { Text(opcion) },
                             onClick = {
                                 categoria.value = opcion
-                                expandedCategoriaDropdown = false
+                                expansionCategoria = false
                             }
                         )
                     }
@@ -1956,25 +2255,42 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                         singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
-                            if (nuevaTallaInput.isNotBlank() && !tallasAgregadas.contains(nuevaTallaInput)) {
+                            if (nuevaTallaInput.isNotBlank() && !tallasAgregadas.contains(
+                                    nuevaTallaInput
+                                )
+                            ) {
                                 tallasAgregadas.add(nuevaTallaInput.trim())
                                 nuevaTallaInput = ""
                             }
-                            keyboardController?.hide()
+                            tecladoControl?.hide()
                         })
                     )
                     Button(
                         onClick = {
-                            if (nuevaTallaInput.isNotBlank() && !tallasAgregadas.contains(nuevaTallaInput)) {
+                            if (nuevaTallaInput.isNotBlank() && !tallasAgregadas.contains(
+                                    nuevaTallaInput
+                                )
+                            ) {
                                 tallasAgregadas.add(nuevaTallaInput.trim())
                                 nuevaTallaInput = ""
-                            } else if (nuevaTallaInput.isNotBlank() && tallasAgregadas.contains(nuevaTallaInput)) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    snackbarHostState.showSnackbar("Esa talla ya ha sido agregada.")
-                                }
+                            } else if (nuevaTallaInput.isNotBlank() && tallasAgregadas.contains(
+                                    nuevaTallaInput
+                                )
+                            ) {
+                                Toast.makeText(
+                                    mensaje,
+                                    "Esa talla ya ha sido agregada.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         },
-                        enabled = nuevaTallaInput.isNotBlank()
+                        enabled = nuevaTallaInput.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.LightGray,
+                            disabledContentColor = Color.White
+                        )
                     ) {
                         Text("+")
                     }
@@ -1987,7 +2303,7 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ){
+                    ) {
                         tallasAgregadas.forEach { tallaConjunto ->
                             InputChip(
                                 selected = false,
@@ -2025,12 +2341,11 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                             imeAction = ImeAction.Done
                         ),
                         keyboardActions = KeyboardActions(
-                            onDone = { keyboardController?.hide() }
+                            onDone = { tecladoControl?.hide() }
                         ),
                         modifier = Modifier.weight(1f),
                         singleLine = true
                     )
-
                     OutlinedTextField(
                         value = precio.value,
                         onValueChange = {
@@ -2045,10 +2360,14 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {
-                                keyboardController?.hide()
+                                tecladoControl?.hide()
                                 val parsedPrice = precio.value.toDoubleOrNull()
                                 if (parsedPrice != null) {
-                                    precio.value = String.format(java.util.Locale.getDefault(), "%.2f", parsedPrice)
+                                    precio.value = String.format(
+                                        java.util.Locale.getDefault(),
+                                        "%.2f",
+                                        parsedPrice
+                                    )
                                 }
                             }
                         ),
@@ -2058,12 +2377,10 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-            }
 
-            // Botón AGREGAR
+            }
             Button(
                 onClick = {
-                    // La lógica de validación se mantiene igual
                     val newNombre = nombre.value.trim()
                     val newReferencia = referencia.value.trim()
                     val newCategoria = categoria.value.trim()
@@ -2075,9 +2392,10 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                         tallasAgregadas.isEmpty() || newDocena == null || newDocena < 0 ||
                         newPrecio == null || newPrecio <= 0
                     ) {
-                        Toast.makeText(context, "Completa todos los campos...", Toast.LENGTH_LONG).show()
+                        Toast.makeText(mensaje, "Completa todos los campos", Toast.LENGTH_LONG)
+                            .show()
                     } else {
-                        isLoading = true
+                        estaCargando = true
                         val nuevoProducto = ProductoDetalle(
                             idFirestore = null,
                             nombre = newNombre,
@@ -2088,26 +2406,33 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
                             stock = newDocena,
                             imagenUrl = null
                         )
-
                         viewModel.guardarNuevoProductoEnFirestore(
                             producto = nuevoProducto,
                             imagenUri = imagenUri,
                             onSuccess = {
-                                isLoading = false
+                                estaCargando = false
                                 mostrarDialogoConfirmacion = true
                             },
                             onFailure = { e ->
-                                isLoading = false
+                                estaCargando = false
                                 Log.e("AgregarProducto", "Error al guardar producto: ${e.message}")
-                                Toast.makeText(context, "Error al guardar producto: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    mensaje,
+                                    "Error al guardar producto: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                ),
+                enabled = !estaCargando
             ) {
-                if (isLoading) {
+                if (estaCargando) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = Color.White,
@@ -2122,49 +2447,115 @@ fun AgregarProductoScreen(navController: NavHostController, viewModel: SharedVie
     if (mostrarDialogoConfirmacion) {
         AlertDialog(
             onDismissRequest = { },
+            properties = androidx.compose.ui.window.DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            ),
             title = {
-                Text("Mercancía agregada")
+                Text("Mercancía agregada", fontWeight = FontWeight.Bold)
             },
             text = {
                 Text("¡Mercancía agregada exitosamente!")
             },
-            confirmButton = {} // Sin botón, solo cierra automático
+            confirmButton = {}
         )
 
         LaunchedEffect(Unit) {
             delay(2000)
             mostrarDialogoConfirmacion = false
-            // Opcional: Navegar a otra pantalla después de agregar, como la lista de productos
-            navController.navigate("vendedoraMenu") { // Navegar al menú de vendedora
-                popUpTo("agregarProducto") { inclusive = true } // Eliminar esta pantalla del back stack
+            navController.navigate("vendedoraMenu") {
+                popUpTo("agregarProducto") {
+                    inclusive = true
+                }
             }
         }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun SolicitudesVendedoraScreen(navController: NavHostController, viewModel: SharedViewModel)
-{
+fun SolicitudesVendedoraScreen(navController: NavHostController, viewModel: SharedViewModel) {
     val solicitudes: SnapshotStateList<SharedViewModel.Solicitud> = viewModel.solicitudes
     var estadoSeleccionado by remember { mutableStateOf<String?>(null) }
-    val currentSortDirection by viewModel.solicitudesSortDirection.collectAsState()
+    val ordenSolicitudes by viewModel.solicitudesSortDirection.collectAsState()
     val tarjetasExpandibles = remember { mutableStateMapOf<String, Boolean>() }
     val botonesVisibles = remember { mutableStateMapOf<String, Boolean>() }
     val solicitudesFiltradas = solicitudes
         .filter { estadoSeleccionado == null || it.estado == estadoSeleccionado }
+    val mensaje = LocalContext.current
+    var solicitudARechazar by remember { mutableStateOf<SharedViewModel.Solicitud?>(null) }
+    var motivoRechazo by remember { mutableStateOf("") }
 
     BackHandler {
-        navController.navigate("vendedoraMenu") {
-            popUpTo("vendedoraSolicitudes") { inclusive = true }
-        }
+        navController.popBackStack()
     }
 
     LaunchedEffect(Unit) {
         viewModel.tieneSolicitudesNuevas = false
     }
 
+    if (solicitudARechazar != null) {
+        AlertDialog(
+            onDismissRequest = {
+                solicitudARechazar = null
+                motivoRechazo = ""
+            },
+            title = { Text("Devolver Solicitud", fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text("Indique el motivo del rechazo:", fontSize = 14.sp)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = motivoRechazo,
+                        onValueChange = { motivoRechazo = it },
+                        label = { Text("Escribe el motivo aquí") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        maxLines = 5,
+                        singleLine = false,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.rechazarSolicitud(solicitudARechazar!!, motivoRechazo)
+                        botonesVisibles[solicitudARechazar!!.idFirestore!!] = false
+                        viewModel.tieneSolicitudesNuevas = false
+
+                        solicitudARechazar = null
+                        motivoRechazo = ""
+                        val toast =
+                            Toast.makeText(mensaje, "Solicitud devuelta", Toast.LENGTH_SHORT)
+                        toast.setGravity(
+                            android.view.Gravity.BOTTOM or android.view.Gravity.CENTER_HORIZONTAL,
+                            0,
+                            100
+                        )
+                        toast.show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+                ) {
+                    Text("Devolver Pedido")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    solicitudARechazar = null
+                    motivoRechazo = ""
+                }) {
+                    Text("Cancelar")
+                }
+            },
+            properties = androidx.compose.ui.window.DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        )
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -2205,53 +2596,69 @@ fun SolicitudesVendedoraScreen(navController: NavHostController, viewModel: Shar
                 .fillMaxSize()
         ) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Filtros de estado
                 val estados = listOf("Aceptada", "Pendiente", "Devuelta")
-                LazyRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
-                {
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     items(estados) { estado ->
                         val activo = estado == estadoSeleccionado
-                        FilterChip(
-                            selected = activo,
-                            onClick = {
-                                estadoSeleccionado = if (activo) null else estado
-                            },
-                            label = { Text(estado) },
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                        )
+                        val colorFondo = if (activo) {
+                            when (estado) {
+                                "Aceptada" -> Color(0xFF2E7D32)
+                                "Pendiente" -> Color(0xFFF9A825)
+                                "Devuelta" -> Color(0xFFD32F2F)
+                                else -> Color.Black
+                            }
+                        } else {
+                            Color.Black
+                        }
+
+                        Button(
+                            onClick = { estadoSeleccionado = if (activo) null else estado },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorFondo,
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(50),
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                                .height(36.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp)
+                        ) {
+                            Text(text = estado, fontSize = 13.sp)
+                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Selector de orden
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Ordenar por fecha:", modifier = Modifier.weight(1f))
-                    // Connect DropdownMenuBox to the ViewModel
-                    DropdownMenuBox(
-                        ordenAscendente = currentSortDirection == Query.Direction.ASCENDING,
+                    Ordenamiento(
+                        ordenAscendente = ordenSolicitudes == Query.Direction.ASCENDING,
                         onOrdenChange = { nuevoOrden ->
-                            val direction = if (nuevoOrden) Query.Direction.ASCENDING else Query.Direction.DESCENDING
+                            val direction =
+                                if (nuevoOrden) Query.Direction.ASCENDING else Query.Direction.DESCENDING
                             viewModel.setSolicitudesSortDirection(direction)
                         }
                     )
-
                 }
+
                 Spacer(modifier = Modifier.height(12.dp))
+
             }
 
-
-            // Lista de solicitudes
             if (solicitudesFiltradas.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("No hay solicitudes registradas", color = Color.Gray)
                 }
             } else {
@@ -2261,37 +2668,22 @@ fun SolicitudesVendedoraScreen(navController: NavHostController, viewModel: Shar
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
-                    // <--- IMPORTANT CHANGE HERE: Use idFirestore as key
                     items(solicitudesFiltradas, key = { it.idFirestore!! }) { solicitud ->
-                        // We use '!!' here because if the request comes from Firestore, its idFirestore should NOT be null.
-                        // If, for any reason, a Solicitud without idFirestore could reach here,
-                        // you should use: key = { it.idFirestore ?: it.id.toString() }
-                        // But ideally, all displayed requests should already have an idFirestore.
+                        val idActual = solicitud.idFirestore!!
 
-                        // <--- IMPORTANT CHANGE HERE: Use idFirestore for maps
-                        val currentIdForKey = solicitud.idFirestore!!
-
-                        LaunchedEffect(currentIdForKey, solicitud.estado) {
-                            if (!tarjetasExpandibles.containsKey(currentIdForKey)) {
-                                tarjetasExpandibles[currentIdForKey] = false
-                            }
-                            if (!botonesVisibles.containsKey(currentIdForKey)) {
-                                botonesVisibles[currentIdForKey] = solicitud.estado == "Pendiente"
-                            } else {
-                                // If the request status changes externally, update visibility
-                                botonesVisibles[currentIdForKey] = solicitud.estado == "Pendiente"
-                            }
+                        LaunchedEffect(idActual, solicitud.estado) {
+                            if (!tarjetasExpandibles.containsKey(idActual)) tarjetasExpandibles[idActual] =
+                                false
+                            botonesVisibles[idActual] = solicitud.estado == "Pendiente"
                         }
 
-                        val expandida = tarjetasExpandibles[currentIdForKey] ?: false
-                        val showButtons = botonesVisibles[currentIdForKey] ?: false
+                        val expandida = tarjetasExpandibles[idActual] ?: false
+                        val mostrarBotones = botonesVisibles[idActual] ?: false
 
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    tarjetasExpandibles[currentIdForKey] = !expandida
-                                },
+                                .clickable { tarjetasExpandibles[idActual] = !expandida },
                             elevation = CardDefaults.cardElevation(4.dp)
                         ) {
                             Row(
@@ -2307,22 +2699,42 @@ fun SolicitudesVendedoraScreen(navController: NavHostController, viewModel: Shar
                                     if (expandida) {
                                         Spacer(modifier = Modifier.height(8.dp))
                                         solicitud.productos.forEach { (productoDetalle, cantidad) ->
-                                            val referencia = productoDetalle?.referencia
-                                            val nombreProducto = productoDetalle?.nombre
-
-                                            if (nombreProducto?.isNotBlank() == true && referencia?.isNotBlank() == true){
-                                                Text("⬤ $nombreProducto |$referencia| - ($cantidad)", style = MaterialTheme.typography.bodyMedium) // Ensure MaterialTheme.typography
+                                            val nombre = productoDetalle?.nombre
+                                            val ref = productoDetalle?.referencia
+                                            if (!nombre.isNullOrBlank() && !ref.isNullOrBlank()) {
+                                                Text(
+                                                    "⬤ $nombre |$ref| - ($cantidad)",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
                                             } else {
-                                                Text("* Producto inválido o incompleto", style = MaterialTheme.typography.bodyMedium) // Ensure MaterialTheme.typography
+                                                Text(
+                                                    "* Producto inválido",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
                                             }
                                         }
                                         Spacer(modifier = Modifier.height(8.dp))
-                                        Text("Fecha: ${solicitud.fecha} ${solicitud.hora}", style = MaterialTheme.typography.bodyMedium) // Ensure MaterialTheme.typography
-                                        Text("Total: \$${String.format("%.2f", solicitud.total)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold) // Ensure MaterialTheme.typography
+                                        Text(
+                                            "Fecha: ${solicitud.fecha} ${solicitud.hora}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            "Total: \$${String.format("%.2f", solicitud.total)}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+
+                                        if (solicitud.estado == "Devuelta" && solicitud.motivoRechazo.isNotBlank()) {
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                "Motivo: ${solicitud.motivoRechazo}",
+                                                color = Color.Red,
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
                                     }
                                 }
 
-                                // Right column: status + buttons (only if expanded and pending)
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
@@ -2336,25 +2748,48 @@ fun SolicitudesVendedoraScreen(navController: NavHostController, viewModel: Shar
                                             else -> Color.Gray
                                         },
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(start = 12.dp)
+                                        modifier = Modifier.padding(bottom = 8.dp)
                                     )
 
-                                    if (expandida && showButtons) {
+                                    if (solicitud.estado == "Aceptada") {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        IconButton(onClick = {
+                                            com.example.kiwi.utils.PdfGenerator(
+                                                mensaje
+                                            ).generarFactura(solicitud)
+                                        }) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_descarga_pdf),
+                                                contentDescription = "Descargar",
+                                                tint = Color.Black,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        }
+                                        Text("Comprobante", fontSize = 9.sp, color = Color.Gray)
+                                    }
+
+                                    if (expandida && mostrarBotones) {
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                             IconButton(onClick = {
                                                 viewModel.aceptarSolicitud(solicitud)
-                                                botonesVisibles[currentIdForKey] = false // Hide instantly
+                                                botonesVisibles[idActual] = false
                                                 viewModel.tieneSolicitudesNuevas = false
                                             }) {
-                                                Icon(Icons.Default.Check, contentDescription = "Aceptar", tint = Color(0xFF2E7D32))
+                                                Icon(
+                                                    Icons.Default.Check,
+                                                    contentDescription = "Aceptar",
+                                                    tint = Color(0xFF2E7D32)
+                                                )
                                             }
                                             IconButton(onClick = {
-                                                viewModel.rechazarSolicitud(solicitud)
-                                                botonesVisibles[currentIdForKey] = false // Hide instantly
-                                                viewModel.tieneSolicitudesNuevas = false
+                                                solicitudARechazar = solicitud
                                             }) {
-                                                Icon(Icons.Default.Close, contentDescription = "Devolver", tint = Color(0xFFD32F2F))
+                                                Icon(
+                                                    Icons.Default.Close,
+                                                    contentDescription = "Devolver",
+                                                    tint = Color(0xFFD32F2F)
+                                                )
                                             }
                                         }
                                     }
@@ -2371,57 +2806,74 @@ fun SolicitudesVendedoraScreen(navController: NavHostController, viewModel: Shar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun EditarProductoScreen(productoReferencia: String, navController: NavHostController, viewModel: SharedViewModel)
-{
-    // Buscar el producto original
+fun EditarProductoScreen(
+    productoReferencia: String,
+    navegacion: NavHostController,
+    viewModel: SharedViewModel
+) {
     val productoOriginal = viewModel.productos.find { it.referencia == productoReferencia }
 
-    // Si no se encuentra el producto, mostrar un mensaje de error y regresar
     if (productoOriginal == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Producto no encontrado para editar", color = Color.Red)
         }
         LaunchedEffect(Unit) {
             delay(1500)
-            navController.popBackStack()
+            navegacion.popBackStack()
         }
         return
     }
-
-    // Estados para los campos editables, inicializados con los valores del producto original
     val nombre = remember { mutableStateOf(productoOriginal.nombre) }
-    val referencia = remember { mutableStateOf(productoOriginal.referencia) } // Considerar si la referencia debería ser editable (clave única)
+    val referencia =
+        remember { mutableStateOf(productoOriginal.referencia) }
     val categoria = remember { mutableStateOf(productoOriginal.categoria) }
-    val categoriasDisponibles = listOf("Suéter", "Blusa", "Jeans", "Enterizo", "Conjunto", "Short", "Falda", "Body", "Traje", "Licra", "Traje de baño", "Mallas")
+    val categoriasDisponibles = listOf(
+        "Suéter",
+        "Blusa",
+        "Jeans",
+        "Enterizo",
+        "Conjunto",
+        "Short",
+        "Falda",
+        "Body",
+        "Traje",
+        "Licra",
+        "Traje de baño",
+        "Mallas"
+    )
     val docena = remember { mutableStateOf(productoOriginal.stock.toString()) }
-    val precio = remember { mutableStateOf(String.format(Locale.getDefault(), "%.2f", productoOriginal.precio)) }
+    val precio = remember {
+        mutableStateOf(
+            String.format(
+                Locale.getDefault(),
+                "%.2f",
+                productoOriginal.precio
+            )
+        )
+    }
 
     var newImagenUri: Uri? by remember { mutableStateOf(null) }
-    var currentImageUrl: String? by remember { mutableStateOf(productoOriginal.imagenUrl) }
-
-    val tallasAgregadas = remember { mutableStateListOf<String>().apply { addAll(productoOriginal.tallas) } }
-    var nuevaTallaInput by remember { mutableStateOf("") }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    var imageActualUrl: String? by remember { mutableStateOf(productoOriginal.imagenUrl) }
+    val tallasAgregadas =
+        remember { mutableStateListOf<String>().apply { addAll(productoOriginal.tallas) } }
+    var nuevaTalla by remember { mutableStateOf("") }
+    val mensaje = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        newImagenUri = uri
-        // Cuando se selecciona una nueva imagen, limpiamos la URL actual para que se muestre la nueva URI local
-        currentImageUrl = null
+        if (uri != null) {
+            newImagenUri = uri
+            imageActualUrl = null
+        }
     }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val tecladoControl = LocalSoftwareKeyboardController.current
     var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
 
     BackHandler {
-        navController.navigate("vendedoraMenu") {
-            popUpTo("editarProducto/${productoReferencia}") { inclusive = true }
-        }
+        navegacion.popBackStack()
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -2445,7 +2897,7 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate("vendedoraMenu") {
+                        navegacion.navigate("vendedoraMenu") {
                             popUpTo("editarProducto/${productoReferencia}") { inclusive = true }
                         }
                     }) {
@@ -2462,16 +2914,15 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Scrollable form
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Nombre
                 OutlinedTextField(
                     value = nombre.value,
                     onValueChange = {
@@ -2485,13 +2936,12 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = { keyboardController?.hide() }
+                        onDone = { tecladoControl?.hide() }
                     )
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Referencia (Normalmente NO editable para evitar romper la clave única, pero lo mantengo si es tu diseño)
                 OutlinedTextField(
                     value = referencia.value,
                     onValueChange = {
@@ -2505,19 +2955,18 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = { keyboardController?.hide() }
+                        onDone = { tecladoControl?.hide() }
                     )
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Categoría estilizada (dropdown)
-                val interactionSource = remember { MutableInteractionSource() }
-                val isPressed by interactionSource.collectIsPressedAsState()
-                var expandedCategoriaDropdown by remember { mutableStateOf(false) }
+                val interaccion = remember { MutableInteractionSource() }
+                val esPresionado by interaccion.collectIsPressedAsState()
+                var categoriaExpandida by remember { mutableStateOf(false) }
 
-                LaunchedEffect(isPressed) {
-                    if (isPressed) expandedCategoriaDropdown = true
+                LaunchedEffect(esPresionado) {
+                    if (esPresionado) categoriaExpandida = true
                 }
 
                 OutlinedTextField(
@@ -2529,13 +2978,13 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                     trailingIcon = {
                         Icon(Icons.Default.ArrowDropDown, contentDescription = "Expandir")
                     },
-                    interactionSource = interactionSource,
+                    interactionSource = interaccion,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 DropdownMenu(
-                    expanded = expandedCategoriaDropdown,
-                    onDismissRequest = { expandedCategoriaDropdown = false },
+                    expanded = categoriaExpandida,
+                    onDismissRequest = { categoriaExpandida = false },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     categoriasDisponibles.forEach { opcion ->
@@ -2543,7 +2992,7 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                             text = { Text(opcion) },
                             onClick = {
                                 categoria.value = opcion
-                                expandedCategoriaDropdown = false
+                                categoriaExpandida = false
                             }
                         )
                     }
@@ -2551,7 +3000,6 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Bloque de visualización de imagen
                 Box(
                     modifier = Modifier
                         .padding(vertical = 12.dp)
@@ -2560,7 +3008,7 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                         .clickable { launcher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (newImagenUri != null) { // Si hay una nueva URI local seleccionada
+                    if (newImagenUri != null) {
                         Image(
                             painter = rememberAsyncImagePainter(newImagenUri),
                             contentDescription = "Imagen seleccionada",
@@ -2569,16 +3017,16 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                                 .widthIn(max = 250.dp)
                                 .heightIn(max = 250.dp)
                         )
-                    } else if (currentImageUrl != null) { // Si no, pero hay una URL existente
+                    } else if (imageActualUrl != null) {
                         Image(
-                            painter = rememberAsyncImagePainter(currentImageUrl),
+                            painter = rememberAsyncImagePainter(imageActualUrl),
                             contentDescription = "Imagen actual",
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
                                 .widthIn(max = 250.dp)
                                 .heightIn(max = 250.dp)
                         )
-                    } else { // Si no hay ninguna imagen
+                    } else {
                         Box(
                             modifier = Modifier
                                 .size(180.dp)
@@ -2592,7 +3040,6 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Sección para agregar/editar tallas dinámicamente
                 Text("Conjuntos de tallas:")
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -2602,7 +3049,7 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                     tallasAgregadas.forEach { tallaConjunto ->
                         InputChip(
                             selected = false,
-                            onClick = { /* No hay acción de selección aquí */ },
+                            onClick = { },
                             label = { Text(tallaConjunto) },
                             trailingIcon = {
                                 IconButton(
@@ -2621,48 +3068,66 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                // Campo para añadir nuevas tallas
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
-                        value = nuevaTallaInput,
-                        onValueChange = { nuevaTallaInput = it },
+                        value = nuevaTalla,
+                        onValueChange = { nuevaTalla = it },
                         label = { Text("Añadir nueva talla (Ej: S, M, L)") },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
-                            if (nuevaTallaInput.isNotBlank() && !tallasAgregadas.contains(nuevaTallaInput.trim())) {
-                                tallasAgregadas.add(nuevaTallaInput.trim())
-                                nuevaTallaInput = ""
-                            } else if (tallasAgregadas.contains(nuevaTallaInput.trim())) {
-                                Toast.makeText(context, "Esa talla ya ha sido agregada.", Toast.LENGTH_SHORT).show()
+                            if (nuevaTalla.isNotBlank() && !tallasAgregadas.contains(
+                                    nuevaTalla.trim()
+                                )
+                            ) {
+                                tallasAgregadas.add(nuevaTalla.trim())
+                                nuevaTalla = ""
+                            } else if (tallasAgregadas.contains(nuevaTalla.trim())) {
+                                Toast.makeText(
+                                    mensaje,
+                                    "Esa talla ya ha sido agregada.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                            keyboardController?.hide()
+                            tecladoControl?.hide()
                         })
                     )
                     Button(
                         onClick = {
-                            if (nuevaTallaInput.isNotBlank() && !tallasAgregadas.contains(nuevaTallaInput.trim())) {
-                                tallasAgregadas.add(nuevaTallaInput.trim())
-                                nuevaTallaInput = ""
-                            } else if (tallasAgregadas.contains(nuevaTallaInput.trim())) {
-                                Toast.makeText(context, "Esa talla ya ha sido agregada.", Toast.LENGTH_SHORT).show()
+                            if (nuevaTalla.isNotBlank() && !tallasAgregadas.contains(
+                                    nuevaTalla.trim()
+                                )
+                            ) {
+                                tallasAgregadas.add(nuevaTalla.trim())
+                                nuevaTalla = ""
+                            } else if (tallasAgregadas.contains(nuevaTalla.trim())) {
+                                Toast.makeText(
+                                    mensaje,
+                                    "Esa talla ya ha sido agregada.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         },
-                        enabled = nuevaTallaInput.isNotBlank()
+                        enabled = nuevaTalla.isNotBlank(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.LightGray,
+                            disabledContentColor = Color.White
+                        )
                     ) {
                         Text("+")
                     }
                 }
 
-
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Docenas (con botones +/-) y Precio x Docena
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -2686,7 +3151,7 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                                 imeAction = ImeAction.Done
                             ),
                             keyboardActions = KeyboardActions(
-                                onDone = { keyboardController?.hide() }
+                                onDone = { tecladoControl?.hide() }
                             ),
                             modifier = Modifier.weight(1f),
                             singleLine = true
@@ -2699,9 +3164,13 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                                     docena.value = (currentDocenas + 1).toString()
                                 },
                                 modifier = Modifier.size(40.dp),
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Text("+", color = Color.White)
+                                contentPadding = PaddingValues(0.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Black,
+                                    contentColor = Color.White
+                                )
+                            ){
+                                Text("+")
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Button(
@@ -2712,14 +3181,16 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                                     }
                                 },
                                 modifier = Modifier.size(40.dp),
-                                contentPadding = PaddingValues(0.dp)
+                                contentPadding = PaddingValues(0.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Black,
+                                    contentColor = Color.White
+                                )
                             ) {
                                 Text("-", color = Color.White)
                             }
                         }
                     }
-
-                    // Campo de "Precio x Docena"
                     OutlinedTextField(
                         value = precio.value,
                         onValueChange = { newValue ->
@@ -2733,12 +3204,14 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                             imeAction = ImeAction.Done
                         ),
                         keyboardActions = KeyboardActions(
-                            onDone = { keyboardController?.hide()
+                            onDone = {
+                                tecladoControl?.hide()
                                 val parsedPrice = precio.value.toDoubleOrNull()
                                 if (parsedPrice != null) {
-                                    // Si es un número válido, formatéalo a dos decimales
-                                    precio.value = String.format(Locale.getDefault(), "%.2f", parsedPrice)
-                                } else if (precio.value.isNotEmpty()) { }
+                                    precio.value =
+                                        String.format(Locale.getDefault(), "%.2f", parsedPrice)
+                                } else if (precio.value.isNotEmpty()) {
+                                }
                             }
                         ),
                         modifier = Modifier.weight(1f),
@@ -2746,26 +3219,25 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                     )
                 }
             }
-
-            // Botón GUARDAR CAMBIOS
             Button(
                 onClick = {
+
                     val newNombre = nombre.value.trim()
                     val newReferencia = referencia.value.trim()
                     val newCategoria = categoria.value.trim()
                     val newDocena = docena.value.toIntOrNull()
                     val newPrecio = precio.value.toDoubleOrNull()
 
-                    // Validación
                     if (
                         newNombre.isBlank() || newReferencia.isBlank() || newCategoria.isBlank() ||
                         tallasAgregadas.isEmpty() || newDocena == null || newDocena < 0 || newPrecio == null || newPrecio <= 0
                     ) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            snackbarHostState.showSnackbar("Completa todos los campos correctamente")
-                        }
+                        Toast.makeText(
+                            mensaje,
+                            "Completa todos los campos correctamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
-                        // Creamos un objeto con todos los datos actualizados de los campos.
                         val productoConNuevosDatos = productoOriginal.copy(
                             nombre = newNombre,
                             referencia = newReferencia,
@@ -2774,23 +3246,32 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
                             precio = newPrecio,
                             stock = newDocena
                         )
-
-                        // Llamamos a la nueva función centralizada en el ViewModel.
                         viewModel.actualizarProductoYGestionarImagen(
                             productoOriginal = productoOriginal,
                             productoActualizado = productoConNuevosDatos,
-                            nuevaImagenUri = newImagenUri, // Pasamos la URI de la nueva imagen (puede ser null).
+                            nuevaImagenUri = newImagenUri,
                             onSuccess = {
                                 mostrarDialogoConfirmacion = true
                             },
                             onFailure = { e ->
-                                Log.e("EditarProducto", "Error al actualizar producto: ${e.message}")
-                                Toast.makeText(context, "Error al guardar cambios: ${e.message}", Toast.LENGTH_LONG).show()
+                                Log.e(
+                                    "EditarProducto",
+                                    "Error al actualizar producto: ${e.message}"
+                                )
+                                Toast.makeText(
+                                    mensaje,
+                                    "Error al guardar cambios: ${e.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                )
             ) {
                 Text("GUARDAR CAMBIOS", color = Color.White)
             }
@@ -2798,25 +3279,27 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
         }
     }
 
-    // Diálogo de confirmación de guardado
     if (mostrarDialogoConfirmacion) {
         AlertDialog(
             onDismissRequest = { },
+            properties = androidx.compose.ui.window.DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            ),
             title = {
-                Text("Producto Actualizado")
+                Text("Producto Actualizado", fontWeight = FontWeight.Bold)
             },
             text = {
                 Text("¡El producto ha sido actualizado exitosamente!")
             },
-            confirmButton = {} // Sin botón, solo cierra automático
+            confirmButton = { }
         )
 
         LaunchedEffect(Unit) {
             delay(2000)
             mostrarDialogoConfirmacion = false
-            navController.navigate("vendedoraMenu") {
-                popUpTo("editarProducto/${productoReferencia}") { inclusive = true }
-            }
+            navegacion.popBackStack()
+
         }
     }
 }
@@ -2824,8 +3307,163 @@ fun EditarProductoScreen(productoReferencia: String, navController: NavHostContr
 
 @Preview(showBackground = true)
 @Composable
-fun SplashPreview() {
+fun SplashPreview(){
     KiwiTheme {
-        SplashScreen(onFinish = {})
+        CargaScreen(onFinish = { })
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductoCard(
+    producto: ProductoDetalle,
+    onClick: () -> Unit,
+    esVendedor: Boolean = false,
+    onDeleteClick: (() -> Unit)? = null
+) {
+    val stockVisible = producto.stock - producto.cantidadReservada
+
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        )
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .height(160.dp)
+                    .fillMaxWidth()
+            ) {
+
+                if (producto.imagenUrl != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(producto.imagenUrl)
+                                .crossfade(true)
+                                .build()
+                        ),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color(0xFFF5F5F5)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_kiwi),
+                            contentDescription = null,
+                            modifier = Modifier.size(60.dp),
+                            alpha = 0.3f
+                        )
+                    }
+                }
+
+                if (stockVisible <= 0) {
+                    Surface(
+                        color = Color(0xFFD32F2F),
+                        shape = RoundedCornerShape(bottomEnd = 12.dp),
+                        modifier = Modifier.align(Alignment.TopStart)
+                    ) {
+                        Text(
+                            text = "AGOTADO",
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                } else if (stockVisible <= 3) {
+                    Surface(
+                        color = Color(0xFFF9A825),
+                        shape = RoundedCornerShape(bottomEnd = 12.dp),
+                        modifier = Modifier.align(Alignment.TopStart)
+                    ) {
+                        Text(
+                            text = "ÚLTIMAS",
+                            color = Color.Black,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
+                if (esVendedor && onDeleteClick != null) {
+                    Surface(
+                        shape = CircleShape,
+                        color = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .size(32.dp)
+                            .clickable { onDeleteClick() }
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Eliminar",
+                                tint = Color.Red,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            ) {
+                Text(
+                    text = producto.nombre,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Ref: ${producto.referencia}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "$${String.format("%.2f", producto.precio)}",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.Black
+                    )
+
+                    if (stockVisible > 0) {
+                        Text(
+                            text = "$stockVisible dcns",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(0xFF388E3C)
+                        )
+                    }
+                }
+            }
+        }
     }
 }

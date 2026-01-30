@@ -107,7 +107,7 @@ class SharedViewModel() : ViewModel() {
                 Log.d("TTL", "Solicitud ${solicitud.idFirestore} marcada para expirar en: $fechaDeExpiracion")
             }
             db.collection("solicitudes").document(id)
-                .update(updates) // Usamos el mapa para actualizar los campos
+                .update(updates)
                 .addOnSuccessListener {
                     Log.d("Firestore", "Estado de solicitud actualizado con ID: $id a ${solicitud.estado}")
 
@@ -117,14 +117,12 @@ class SharedViewModel() : ViewModel() {
 
                         productoOriginal?.let { p ->
                             val updatedProduct = when (solicitud.estado) {
-                                // AL ACEPTAR: Se reduce el stock total y la cantidad reservada.
                                 "Aceptada" -> {
                                     p.copy(
                                         stock = p.stock - cantidadPedida,
                                         cantidadReservada = p.cantidadReservada - cantidadPedida
                                     )
                                 }
-                                // AL RECHAZAR: Solo se devuelve la cantidad reservada. El stock total no se toca.
                                 "Devuelta" -> {
                                     p.copy(
                                         cantidadReservada = p.cantidadReservada - cantidadPedida
@@ -136,9 +134,6 @@ class SharedViewModel() : ViewModel() {
                         }
                     }
                     tieneActualizacionSolicitudesComprador = true
-                }
-                .addOnFailureListener { e ->
-                    Log.w("Firestore", "Error al actualizar estado de solicitud", e)
                 }
         }
     }
@@ -213,21 +208,24 @@ class SharedViewModel() : ViewModel() {
         onFailure: (Exception) -> Unit
     ) {
         val newDocRef = db.collection("productos").document()
-        val productoConIdFirestore = producto.copy(idFirestore = newDocRef.id)
+        val productoConDatos = producto.copy(
+            idFirestore = newDocRef.id,
+            timestamp = Timestamp.now()
+        )
 
         if (imagenUri != null) {
             uploadImageToFirebaseStorage(
                 uri = imagenUri,
                 onSuccess = { imageUrl ->
-                    val productoFinalConImagen = productoConIdFirestore.copy(imagenUrl = imageUrl)
-                    newDocRef.set(productoFinalConImagen)
+                    val productoFinal = productoConDatos.copy(imagenUrl = imageUrl)
+                    newDocRef.set(productoFinal)
                         .addOnSuccessListener { onSuccess() }
                         .addOnFailureListener { onFailure(it) }
                 },
                 onFailure = { onFailure(it) }
             )
         } else {
-            newDocRef.set(productoConIdFirestore)
+            newDocRef.set(productoConDatos)
                 .addOnSuccessListener { onSuccess() }
                 .addOnFailureListener { onFailure(it) }
         }
@@ -284,7 +282,8 @@ class SharedViewModel() : ViewModel() {
         var estado: String = "",
         val comprador: String = "",
         val celular: String = "",
-        val fechaExpiracion: Timestamp? = null
+        val fechaExpiracion: Timestamp? = null,
+        val motivoRechazo: String = ""
     ) {
         constructor() : this(
             idFirestore = null,
@@ -297,7 +296,8 @@ class SharedViewModel() : ViewModel() {
             estado = "",
             comprador = "",
             celular = "",
-            fechaExpiracion = null
+            fechaExpiracion = null,
+            motivoRechazo = ""
         )
     }
 
@@ -321,17 +321,15 @@ class SharedViewModel() : ViewModel() {
 
 
     fun realizarPedido(nombre: String, celular: String) {
-        // Informa a la UI que el proceso ha comenzado
         estadoPedido = EstadoPedido.Loading
         viewModelScope.launch {
             val db = FirebaseFirestore.getInstance()
             try {
-                // Ejecuta todo el proceso como una transacción atómica
+
                 val resultado = db.runTransaction { transaction ->
                     val productosAgotados = mutableListOf<ProductoEnPedido>()
                     val productosDisponibles = mutableListOf<ProductoEnPedido>()
 
-                    // Valida el stock de cada producto en el carrito DENTRO de la transacción
                     for (itemEnCarrito in carrito) {
                         val productoRef = db.collection("productos").document(itemEnCarrito.producto!!.idFirestore!!)
                         val productoSnapshot = transaction.get(productoRef)
@@ -345,23 +343,19 @@ class SharedViewModel() : ViewModel() {
                         }
                     }
 
-                    // Si hay productos agotados, la transacción retorna un estado de Conflicto
                     if (productosAgotados.isNotEmpty()) {
                         return@runTransaction EstadoPedido.Conflict(PedidoConflict(productosAgotados, productosDisponibles))
                     }
 
-                    // Si no hay conflicto, se preparan las operaciones de escritura
                     val productosDelPedido = carrito.toList()
                     val total = productosDelPedido.sumOf { it.producto?.precio?.times(it.cantidad) ?: 0.0 }
                     val nuevaSolicitudRef = db.collection("solicitudes").document()
 
-                    // Actualiza la cantidad reservada de cada producto
                     productosDelPedido.forEach { item ->
                         val productoRef = db.collection("productos").document(item.producto!!.idFirestore!!)
                         transaction.update(productoRef, "cantidadReservada", FieldValue.increment(item.cantidad.toLong()))
                     }
 
-                    // Crea una nueva solicitud
                     val solicitudData = Solicitud(
                         productos = productosDelPedido,
                         total = total,
@@ -373,16 +367,12 @@ class SharedViewModel() : ViewModel() {
                         celular = celular.ifBlank { "00000000" }
                     )
                     transaction.set(nuevaSolicitudRef, solicitudData)
-
-                    // Si todo sale bien, la transacción retorna al estado de Éxito
                     return@runTransaction EstadoPedido.Success
 
                 }.await()
 
-                // Actualiza el estado final en el ViewModel para que la UI reaccione
                 estadoPedido = resultado
 
-                // Si el resultado fue exitoso, se limpia el carrito
                 if (resultado is EstadoPedido.Success) {
                     carrito.clear()
                 }
@@ -410,9 +400,42 @@ class SharedViewModel() : ViewModel() {
     }
 
 
-    fun rechazarSolicitud(solicitud: Solicitud) {
-        val solicitudActualizada = solicitud.copy(estado = "Devuelta")
-        actualizarEstadoSolicitudEnFirestore(solicitudActualizada)
+    fun rechazarSolicitud(solicitud: Solicitud, motivo: String) {
+        val solicitudId = solicitud.idFirestore ?: return
+        val ref = db.collection("solicitudes").document(solicitudId)
+        val updates = mapOf(
+            "estado" to "Devuelta",
+            "motivoRechazo" to motivo
+        )
+
+        ref.update(updates)
+            .addOnSuccessListener {
+
+                val index = solicitudes.indexOfFirst { it.idFirestore == solicitudId }
+                if (index != -1) {
+                    solicitudes[index] = solicitudes[index].copy(
+                        estado = "Devuelta",
+                        motivoRechazo = motivo
+                    )
+                }
+
+                solicitud.productos.forEach { productoEnPedido ->
+                    val cantidadPedida = productoEnPedido.cantidad
+                    val productoOriginal = productos.find { it.referencia == productoEnPedido.producto?.referencia }
+
+                    productoOriginal?.let { p ->
+                        val updatedProduct = p.copy(
+                            cantidadReservada = p.cantidadReservada - cantidadPedida
+                        )
+                        actualizarProductoEnFirestore(updatedProduct)
+                    }
+                }
+
+                tieneActualizacionSolicitudesComprador = true
+            }
+            .addOnFailureListener { e ->
+                Log.e("ViewModel", "Error al rechazar solicitud", e)
+            }
     }
 
 
@@ -446,9 +469,9 @@ data class PedidoConflict(
 
 
 sealed class EstadoPedido {
-    object Idle : EstadoPedido() // Estado inicial
-    object Loading : EstadoPedido() // Procesando
-    object Success : EstadoPedido() // Éxito
-    data class Conflict(val info: PedidoConflict) : EstadoPedido() // Conflicto de stock
-    data class Failure(val error: String) : EstadoPedido() // Error general
+    object Idle : EstadoPedido()
+    object Loading : EstadoPedido()
+    object Success : EstadoPedido()
+    data class Conflict(val info: PedidoConflict) : EstadoPedido()
+    data class Failure(val error: String) : EstadoPedido()
 }
