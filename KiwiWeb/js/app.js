@@ -57,6 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 navBar.classList.add('oculto');
                 navBar.style.display = 'none';
             }
+
+            // Asegurar que controles-admin esté oculto en Login
+            const controlesAdmin = document.getElementById('controles-admin');
+            if (controlesAdmin) {
+                controlesAdmin.classList.add('oculto');
+                controlesAdmin.style.display = 'none';
+            }
         }, 500);
     }, 2500);
 

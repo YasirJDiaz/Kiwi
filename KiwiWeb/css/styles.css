@@ -507,6 +507,18 @@ body {
     font-weight: 600;
 }
 
+/* Desktop Optimization for Chips */
+/* Desktop Optimization for Chips */
+@media (min-width: 768px) {
+    .chip {
+        min-height: 2rem;
+        /* 32px standard desktop */
+        padding: 0.25rem 0.85rem;
+        font-size: 0.75rem;
+        /* 12px */
+    }
+}
+
 /* Grid de Productos */
 /* Grid de Productos Moderno - Despliegue automático */
 .grid-productos {
@@ -1221,6 +1233,23 @@ body {
     /* 48px */
     box-sizing: border-box;
     width: 100%;
+
+    /* Normalizar iOS */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-radius: 0.5rem;
+    /* Force radius on iOS */
+}
+
+/* Custom Arrow for Selects because appearance:none hides it */
+select.input-selector {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+    /* Space for arrow */
 }
 
 /* Estilo para opción placeholder en select */
@@ -1261,6 +1290,12 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     /* Restore subtle shadow for depth */
     transition: all 0.2s;
+
+    /* Acortar botón y centrar */
+    width: 90% !important;
+    max-width: 380px !important;
+    display: block;
+    margin: 0 auto;
 }
 
 #btn-agregar-carrito:hover {
@@ -1430,6 +1465,10 @@ body {
     gap: 1rem;
 }
 
+.controles-admin.oculto {
+    display: none !important;
+}
+
 .fab-admin.primario {
     background-color: #000 !important;
     color: #fff !important;
@@ -1481,13 +1520,53 @@ body {
    PANTALLA EDITAR PRODUCTO
    ========================================= */
 
+/* Layout Flexbox Robusto para Pantalla Completa (Mobile App Like) */
+#pantalla-editar-producto,
+#pantalla-agregar-producto {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    /* Force Top Alignment */
+    height: 100vh;
+    height: 100dvh;
+    /* Dynamic Viewport Height for mobile browsers */
+    overflow: hidden;
+    /* Lock main scroll */
+    background-color: #fff;
+    position: fixed;
+    /* Ensure it overlays everything */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 200;
+    /* High z-index */
+}
+
+/* Header inside this layout stays static/relative at top */
+#pantalla-editar-producto .header-detalle,
+#pantalla-agregar-producto .header-detalle {
+    flex-shrink: 0;
+    position: relative;
+    /* Override sticky */
+    top: auto;
+    width: 100%;
+}
+
 .edit-product-content {
-    padding: 0.75rem 1.25rem 1.25rem 1.25rem;
-    /* Top reduced as requested previously */
+    padding: 1.25rem;
+    padding-top: 1.25rem;
+    /* Normal internal padding */
+    padding-bottom: 5rem;
+    /* Space for bottom actions */
     max-width: 600px;
     margin: 0 auto;
     width: 100%;
     flex: 1;
+    /* Take remaining space */
+    overflow-y: auto;
+    /* Internal scroll */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scroll iOS */
 }
 
 .edit-product-form {
@@ -1635,6 +1714,8 @@ body {
     margin: 0 auto;
     width: 100%;
     flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .add-product-form {

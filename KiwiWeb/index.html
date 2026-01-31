@@ -207,8 +207,7 @@
     </div>
 
     <!-- PANTALLA EDITAR PRODUCTO (Oculta) -->
-    <div id="pantalla-editar-producto" class="pantalla-completa oculto"
-        style="background-color: #fff; flex-direction: column; overflow-y: auto; display: none;">
+    <div id="pantalla-editar-producto" class="pantalla-completa oculto">
         <!-- Header -->
         <header class="header-detalle">
             <button id="btn-atras-editar" class="btn-icono">
@@ -220,7 +219,7 @@
             <div style="width: 24px;"></div>
         </header>
 
-        <div class="contenido-detalle" style="padding: 290px 24px 24px 24px;">
+        <div class="edit-product-content">
             <form id="form-editar-producto">
                 <!-- Nombre -->
                 <div class="grupo-input">
@@ -300,11 +299,8 @@
                     </div>
                 </div>
 
-                <div
-                    style="position: fixed; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 100;">
-                    <button type="submit" class="boton-primario"
-                        style="background-color: #000; color: #fff; border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.3); width: auto; padding: 12px 40px; border-radius: 30px;">GUARDAR
-                        CAMBIOS</button>
+                <div class="edit-actions-container">
+                    <button type="submit" class="boton-primario boton-static-force">GUARDAR CAMBIOS</button>
                 </div>
                 <div style="height: 80px;"></div>
             </form>
@@ -552,9 +548,9 @@
     </div>
 
     <!-- PANTALLA AGREGAR PRODUCTO (Vendedor) -->
-    <div id="pantalla-agregar-producto" class="pantalla-completa oculto"
-        style="background-color: #fff; flex-direction: column; overflow-y: auto; justify-content: flex-start; align-items: stretch; display: none;">
-        <header class="header-detalle" style="position: sticky; top: 0; background: white; z-index: 10;">
+    <!-- PANTALLA AGREGAR PRODUCTO (Vendedor) -->
+    <div id="pantalla-agregar-producto" class="pantalla-completa oculto">
+        <header class="header-detalle">
             <button id="btn-atras-agregar" class="btn-icono">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
