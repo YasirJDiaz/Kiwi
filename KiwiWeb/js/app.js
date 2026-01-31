@@ -835,40 +835,43 @@ document.addEventListener('DOMContentLoaded', () => {
     let checkoutPendiente = false;
 
     // --- FUNCIÓN DE TRANSICIÓN SUAVE (Global) ---
+    // --- FUNCIÓN DE TRANSICIÓN SUAVE (Mejorada) ---
     function cambiarPantalla(pantallaSalida, pantallaEntrada, displayMode = 'flex') {
         if (!pantallaSalida || !pantallaEntrada) return;
-        if (pantallaSalida === pantallaEntrada) return; // Evitar transición a sí mismo
+        if (pantallaSalida === pantallaEntrada) return;
 
-        // 1. Fade Out Salida
+        // Cerrar teclado/foco si existe
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+
+        // 1. Ocultar inmediatamente Salida (Fade)
         pantallaSalida.style.opacity = '0';
 
-        // 2. Esperar animación y cambiar
+        // 2. Timeout para cambio de display
         setTimeout(() => {
-            // Ocultar todo explicito para evitar overlaps
-            pantallaCatalogo.style.display = 'none';
-            pantallaCarrito.style.display = 'none';
-            // pantallaDetalle y Factura se manejan con clases oculto, pero aseguramos display none
-            pantallaFactura.style.display = 'none';
-            if (pantallaDetalle) pantallaDetalle.style.display = 'none';
-            if (pantallaSolicitudes) pantallaSolicitudes.style.display = 'none'; // Asegurar ocultar solicitudes
+            // "Reset" completo de displays para evitar que ocupen espacio fantasma
+            [pantallaCatalogo, pantallaCarrito, pantallaFactura, pantallaSolicitudes, pantallaDetalle, pantallaLogin, pantallaAgregar, pantallaSolicitudesVendedora, pantallaEditar].forEach(p => {
+                if (p) {
+                    p.style.display = 'none';
+                    p.classList.add('oculto'); // Asegurar clase
+                }
+            });
 
-            pantallaSalida.classList.add('oculto');
-            pantallaSalida.style.display = 'none';
-
-            if (pantallaSolicitudes) pantallaSolicitudes.classList.add('oculto');
-
-
-            // Preparar Entrada (Oculta pero con display)
+            // Preparar Entrada
             pantallaEntrada.classList.remove('oculto');
             pantallaEntrada.style.display = displayMode;
-            pantallaEntrada.style.opacity = '0';
+            pantallaEntrada.style.opacity = '0'; // Empezar invisible
 
-            // 3. Fade In Entrada (Pequeño delay para que el navegador procese el display)
-            setTimeout(() => {
+            // Scroll Top forzado (Ayuda a resetear viewport en iOS)
+            window.scrollTo(0, 0);
+
+            // 3. Fade In
+            requestAnimationFrame(() => {
                 pantallaEntrada.style.opacity = '1';
-            }, 50);
+            });
 
-        }, 300); // 300ms coincide con CSS
+        }, 300);
     }
 
     // Lógica de Navegación (Tabs) - Reemplaza a la anterior
@@ -1148,14 +1151,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         const cant = item.cantidad || 0;
 
                         productosHtml += `
-                            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee;">
-                                <div style="font-weight: 600; font-size: 14px; color: #333;">${nombre}</div>
-                                <div style="font-size: 12px; color: #666; display: flex; justify-content: space-between; margin-top: 2px;">
-                                    <span>Ref: ${ref}</span>
-                                    <span>${cant} Docenas x ${precioDoc}</span>
+                                <div class="pedido-item-row">
+                                    <div class="pedido-item-nombre">${nombre}</div>
+                                    <div class="pedido-item-detalle">
+                                        <span>Ref: ${ref}</span>
+                                        <span>${cant} Docenas x ${precioDoc}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
                     });
 
                     const nombreCliente = pedido.comprador || (pedido.cliente ? pedido.cliente.nombre : "Cliente Web");
@@ -1164,10 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const card = document.createElement('div');
                     card.className = 'pedido-card';
-                    card.style.cssText = `
-                        background: white; border-radius: 12px; padding: 15px;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px;
-                    `;
+                    // Inline style removed, using .pedido-card class
 
                     // Botones de Acción según Estado
                     let botonAccionHtml = '';
@@ -1191,25 +1191,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         </button>`;
                     }
 
+
                     // Layout: ID + (Botón + Estado) | Lista Productos | Fecha + Total
                     card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                            <span style="font-weight: 700; color: #333; font-size: 15px;">Orden #${id.slice(0, 6).toUpperCase()}</span>
-                            <div style="display: flex; align-items: center;">
-                                ${botonAccionHtml}
-                                <span style="font-size: 12px; background: ${estadoBg}; color: ${estadoColor}; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${estado}</span>
+                            <div class="pedido-header">
+                                <span class="pedido-id">Orden #${id.slice(0, 6).toUpperCase()}</span>
+                                <div class="pedido-header-actions">
+                                    ${botonAccionHtml}
+                                    <span class="etiqueta-estado" style="background: ${estadoBg}; color: ${estadoColor};">${estado}</span>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div style="background: #fafafa; padding: 10px; border-radius: 8px; margin: 5px 0;">
-                            ${productosHtml}
-                        </div>
+                            
+                            <div class="pedido-productos">
+                                ${productosHtml}
+                            </div>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                             <div style="font-size: 12px; color: #888;">${fechaDisplay}</div>
-                            <span style="font-weight: 700; color: var(--color-primario); font-size: 18px;">${totalFormato}</span>
-                        </div>
-                    `;
+                            <div class="pedido-footer">
+                                 <div class="pedido-fecha">${fechaDisplay}</div>
+                                <span class="pedido-total">${totalFormato}</span>
+                            </div>
+                        `;
                     listaContainer.appendChild(card);
                 });
             }, (error) => {
@@ -1643,12 +1644,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 1. ESTADO PENDIENTE
                     if (estado === 'Pendiente') {
                         containerAcciones.innerHTML = `
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn-accion-aceptar" style="flex: 1; background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                                    <span>✅</span> ACEPTAR
+                            <div class="vendor-actions-row">
+                                <button class="btn-vendor-action accept btn-accion-aceptar">
+                                    ACEPTAR
                                 </button>
-                                <button class="btn-accion-devolver" style="flex: 1; background: #F44336; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                                    <span>❌</span> DEVOLVER
+                                <button class="btn-vendor-action reject btn-accion-devolver">
+                                    DEVOLVER
                                 </button>
                             </div>
                         `;
@@ -1705,12 +1706,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Dado "aparece un cuadro", inyectaremos un mini formulario en la card
 
                             containerAcciones.innerHTML = `
-                                <div class="form-devolucion" style="background: #ffebee; padding: 10px; border-radius: 8px;">
-                                    <label style="font-size: 12px; color: #d32f2f; font-weight: bold;">Motivo de devolución:</label>
-                                    <input type="text" class="input-motivo" placeholder="Ej: Falta de stock..." style="width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ffcdd2; border-radius: 4px;">
-                                    <div style="display: flex; gap: 5px; justify-content: flex-end;">
-                                        <button class="btn-cancelar-dev" style="background: none; border: none; color: #666; cursor: pointer;">Cancelar</button>
-                                        <button class="btn-confirmar-dev" style="background: #d32f2f; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer;">Confirmar</button>
+                                <div class="rejection-form">
+                                    <label class="rejection-label">Motivo de devolución:</label>
+                                    <input type="text" class="rejection-input input-motivo" placeholder="Ej: Falta de stock...">
+                                    <div class="rejection-actions">
+                                        <button class="btn-rejection-cancel btn-cancelar-dev">Cancelar</button>
+                                        <button class="btn-rejection-confirm btn-confirmar-dev">Confirmar</button>
                                     </div>
                                 </div>
                             `;

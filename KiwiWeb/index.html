@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Kiwi | Lo que necesitas</title>
     <link rel="icon" type="image/png" href="assets/img/logo_kiwi.png">
     <meta name="description" content="Bienvenido a Kiwi, tu tienda de moda favorita.">
@@ -194,12 +195,15 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Botón de Acción (Footer) -->
-        <div class="footer-detalle">
-            <button id="btn-agregar-carrito" class="boton-primario">AGREGAR AL CARRITO</button>
+            <!-- Botón de Acción (Estático) -->
+            <div class="acciones-detalle" style="margin-top: 0;">
+                <button id="btn-agregar-carrito" class="boton-primario">AGREGAR AL CARRITO</button>
+            </div>
         </div>
+    </div>
+
+    <!-- (Footer Removed) -->
     </div>
 
     <!-- PANTALLA EDITAR PRODUCTO (Oculta) -->
@@ -307,107 +311,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA AGREGAR PRODUCTO (Oculta) -->
-    <div id="pantalla-agregar-producto" class="pantalla-completa oculto"
-        style="background-color: #fff; flex-direction: column; overflow-y: auto; display: none;">
-        <!-- Header -->
-        <header class="header-detalle">
-            <button id="btn-atras-agregar" class="btn-icono">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                </svg>
-            </button>
-            <img src="assets/img/logo_kiwi.png" alt="Logo Kiwi" style="height: 40px; width: auto; object-fit: contain;">
-            <div style="width: 24px;"></div>
-        </header>
 
-        <div class="contenido-detalle" style="padding: 290px 24px 24px 24px;">
-            <form id="form-agregar-producto">
-                <!-- Nombre -->
-                <div class="grupo-input">
-                    <input type="text" id="add-nombre" required placeholder=" ">
-                    <label for="add-nombre">Nombre del producto</label>
-                </div>
-
-                <!-- Referencia -->
-                <div class="grupo-input">
-                    <input type="text" id="add-referencia" required placeholder=" ">
-                    <label for="add-referencia">Referencia</label>
-                </div>
-
-                <!-- Categoría (Select) -->
-                <div class="grupo-input">
-                    <select id="add-categoria" required class="input-selector"
-                        style="width: 100%; height: 50px; border: 1px solid #ccc; border-radius: 8px; padding: 0 12px;">
-                        <option value="" disabled selected>Categoría</option>
-                        <option value="Suéter">Suéter</option>
-                        <option value="Blusa">Blusa</option>
-                        <option value="Jeans">Jeans</option>
-                        <option value="Enterizo">Enterizo</option>
-                        <option value="Conjunto">Conjunto</option>
-                        <option value="Short">Short</option>
-                        <option value="Falda">Falda</option>
-                        <option value="Body">Body</option>
-                        <option value="Traje">Traje</option>
-                        <option value="Licra">Licra</option>
-                        <option value="Traje de baño">Traje de baño</option>
-                        <option value="Mallas">Mallas</option>
-                    </select>
-                </div>
-
-                <!-- Imagen -->
-                <div class="add-imagen-container" style="margin: 20px 0; text-align: center;">
-                    <div id="add-preview-imagen-container"
-                        style="width: 200px; height: 200px; margin: 0 auto; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; cursor: pointer;">
-                        <img id="add-preview-imagen" src="" alt="Preview"
-                            style="width: 100%; height: 100%; object-fit: contain; display: none;">
-                        <span id="add-placeholder-img" style="color: #888;">Toca para agregar imagen</span>
-                        <input type="file" id="add-input-imagen" accept="image/*"
-                            style="opacity: 0; position: absolute; inset: 0; cursor: pointer;">
-                    </div>
-                </div>
-
-                <!-- Tallas (Chips) -->
-                <div class="add-tallas-section">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Conjuntos de tallas:</label>
-                    <div id="add-lista-tallas-chips" class="chips-container"
-                        style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
-                        <!-- Chips inyectados por JS -->
-                    </div>
-
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="add-input-nueva-talla" placeholder="Ej: S, M, L"
-                            style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
-                        <button type="button" id="btn-add-talla-agregar" class="boton-secundario"
-                            style="width: 50px; font-size: 24px; padding: 0; background-color: #000; color: #fff; display: flex; align-items: center; justify-content: center;">+</button>
-                    </div>
-                </div>
-
-                <div style="height: 20px;"></div>
-
-                <!-- Stock y Precio -->
-                <div style="display: flex; gap: 12px;">
-                    <div class="grupo-input" style="flex: 1;">
-                        <input type="number" id="add-docenas" required placeholder=" ">
-                        <label for="add-docenas">Docenas</label>
-                    </div>
-
-                    <div class="grupo-input" style="flex: 1;">
-                        <input type="number" id="add-precio" step="0.01" required placeholder=" ">
-                        <label for="add-precio">Precio x Docena</label>
-                    </div>
-                </div>
-
-                <div
-                    style="position: fixed; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 100;">
-                    <button type="submit" class="boton-primario"
-                        style="background-color: #000; color: #fff; border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.3); width: auto; padding: 12px 40px; border-radius: 30px;">AGREGAR
-                        PRODUCTO</button>
-                </div>
-                <div style="height: 80px;"></div>
-            </form>
-        </div>
-    </div>
 
     <!-- PANTALLA CARRITO (Oculta por defecto) -->
     <div id="pantalla-carrito" class="pantalla-completa oculto" style="background-color: #f5f5f5; display: none;">
@@ -455,20 +359,17 @@
                 </svg>
             </button>
             <img src="assets/img/logo_kiwi.png" alt="Kiwi" class="logo-header-detalle">
-            <div style="width: 40px;"></div> <!-- Spacer -->
+            <div style="width: 40px;"></div> <!-- Spacer equilibrado con botón -->
         </div>
 
-        <div class="contenido-detalle" style="padding: 20px; max-width: 600px; margin: 0 auto; width: 100%;">
+        <div class="factura-content">
 
-            <div style="text-align: center; margin-bottom: 2rem; padding-top: 2rem;">
-                <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 0.5rem;">Datos para factura no fiscal
-                </h2>
-                <p style="color: #666; font-size: 14px;">
-                    Coloque sus datos para generar su comprobante de mercancía.
-                </p>
+            <div class="factura-header-texto">
+                <h2>Datos para factura no fiscal</h2>
+                <p>Coloque sus datos para generar su comprobante de mercancía.</p>
             </div>
 
-            <form id="formulario-factura" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <form id="formulario-factura" class="factura-form">
                 <div class="grupo-input">
                     <input type="text" id="factura-nombre" required placeholder=" ">
                     <label for="factura-nombre">Nombre Completo</label>
@@ -486,13 +387,13 @@
                     <label for="factura-email">Correo Electrónico</label>
                     <span class="mensaje-error"></span>
                 </div>
-            </form>
 
-            <div style="margin-top: 3rem; display: flex; justify-content: center;">
-                <button id="btn-enviar-pedido" class="boton-primario" style="max-width: 300px; border-radius: 30px;">
-                    ENVIAR
-                </button>
-            </div>
+                <div class="factura-actions">
+                    <button type="submit" id="btn-enviar-pedido" class="boton-primario">
+                        ENVIAR
+                    </button>
+                </div>
+            </form>
 
             <div style="height: 100px;"></div>
         </div>
@@ -530,7 +431,7 @@
 
     <!-- PANTALLA SOLICITUDES VENDEDORA (Admin) -->
     <div id="pantalla-solicitudes-vendedora" class="pantalla-completa oculto"
-        style="background-color: #f5f5f5; display: none; flex-direction: column; align-items: stretch;">
+        style="background-color: #f5f5f5; display: none; flex-direction: column; align-items: stretch; justify-content: flex-start; overflow-y: auto;">
         <!-- Header -->
         <header class="header-detalle" style="background-color: #fff;">
             <button id="btn-atras-solicitudes-vendedora" class="btn-icono">
@@ -542,16 +443,15 @@
             <div style="width: 40px;"></div> <!-- Spacer -->
         </header>
 
-        <div class="contenido-solicitudes-vendedora" style="padding: 12px; overflow-y: auto; flex: 1; width: 100%;">
+        <div class="vendor-screen-content">
             <!-- Lista de Solicitudes (Visible si hay datos) -->
-            <div id="lista-solicitudes-vendedora"
-                style="width: 100%; max-width: 600px; margin: 0 auto; display: none; padding: 10px;">
+            <div id="lista-solicitudes-vendedora" class="vendor-request-list">
                 <!-- Items inyectados por JS -->
             </div>
 
             <!-- Empty State -->
-            <div id="mensaje-vacio-vendedora" class="mensaje-vacio">
-                <p style="text-align: center; color: #888; margin-top: 50px;">No hay solicitudes pendientes.</p>
+            <div id="mensaje-vacio-vendedora" class="mensaje-vacio vendor-empty-state">
+                <p>No hay solicitudes pendientes.</p>
             </div>
         </div>
     </div>
@@ -561,7 +461,7 @@
 
     <!-- PANTALLA EDITAR PRODUCTO (Vendedor) -->
     <div id="pantalla-editar-producto" class="pantalla-completa oculto"
-        style="background-color: #fff; flex-direction: column; display: none; overflow-y: auto;">
+        style="background-color: #fff; display: none; flex-direction: column; justify-content: flex-start; align-items: stretch; overflow-y: auto;">
         <header class="header-detalle" style="position: sticky; top: 0; background: white; z-index: 10;">
             <button id="btn-atras-editar" class="btn-icono">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -571,155 +471,173 @@
             <span class="titulo-header">Editar Producto</span>
             <div style="width: 40px;"></div>
         </header>
-        <div style="padding: 20px; max-width: 600px; margin: 0 auto; width: 100%;">
-            <form id="form-editar-producto" style="display: flex; flex-direction: column; gap: 1.5rem;">
 
-                <!-- Imagen -->
-                <div class="campo-imagen-admin" style="text-align: center;">
-                    <label for="edit-input-imagen" style="cursor: pointer; display: inline-block;">
-                        <img id="edit-preview-imagen" src=""
-                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; display: none;">
-                        <div id="edit-placeholder-img"
-                            style="width: 120px; height: 120px; background: #eee; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #999;">
-                            📷
-                        </div>
-                        <div
-                            style="margin-top: 8px; font-size: 14px; color: var(--color-secundario); font-weight: 600;">
-                            Cambiar Foto</div>
-                    </label>
-                    <input type="file" id="edit-input-imagen" accept="image/*" style="display: none;">
-                </div>
+        <div class="edit-product-content">
+            <form id="form-editar-producto" class="edit-product-form">
 
+                <!-- 1. Nombre -->
                 <div class="grupo-input">
                     <input type="text" id="edit-nombre" required placeholder=" ">
                     <label>Nombre del Producto</label>
                 </div>
+
+                <!-- 2. Referencia -->
                 <div class="grupo-input">
                     <input type="text" id="edit-referencia" required placeholder=" ">
                     <label>Referencia</label>
                 </div>
 
-                <div style="display: flex; gap: 15px;">
-                    <div class="grupo-input" style="flex: 1;">
-                        <input type="number" id="edit-precio" required placeholder=" " step="0.01">
-                        <label>Precio ($)</label>
+                <!-- 3. Categoría -->
+                <div> <!-- Wrapper simple para etiqueta estática -->
+                    <label class="label-titulo-campo">Categoría</label>
+                    <div style="position: relative;">
+                        <select id="edit-categoria" class="select-moderno">
+                            <option value="" disabled selected>Seleccionar</option>
+                            <option value="Suéter">Suéter</option>
+                            <option value="Blusa">Blusa</option>
+                            <option value="Jeans">Jeans</option>
+                            <option value="Enterizo">Enterizo</option>
+                            <option value="Conjunto">Conjunto</option>
+                            <option value="Short">Short</option>
+                            <option value="Falda">Falda</option>
+                            <option value="Body">Body</option>
+                            <option value="Traje">Traje</option>
+                            <option value="Licra">Licra</option>
+                            <option value="Traje de baño">Traje de baño</option>
+                            <option value="Mallas">Mallas</option>
+                        </select>
+                        <!-- Arrow Icon hint if needed, but select default is often fine for natives -->
                     </div>
+                </div>
+
+                <!-- 4. Imagen -->
+                <div class="campo-imagen-edit">
+                    <label for="edit-input-imagen" class="imagen-edit-trigger">
+                        <img id="edit-preview-imagen" src="" class="imagen-edit-preview">
+                        <div id="edit-placeholder-img" class="imagen-edit-placeholder">
+                            <span>Toca para cambiar foto</span>
+                        </div>
+                    </label>
+                    <input type="file" id="edit-input-imagen" accept="image/*" style="display: none;">
+                </div>
+
+                <!-- 5. Tallas -->
+                <div class="tallas-edit-container">
+                    <label class="label-titulo-campo">Editar tallas:</label>
+                    <div class="input-talla-row">
+                        <input type="text" id="input-nueva-talla" placeholder="Ej: S, M, L" class="input-talla-field">
+                        <button type="button" id="btn-add-talla" class="btn-add-talla">+</button>
+                    </div>
+                    <div id="lista-tallas-chips" class="lista-tallas-chips"></div>
+                </div>
+
+                <!-- 6. Docenas y Precio (Al Final) -->
+                <div style="display: flex; gap: 1rem;">
                     <div class="grupo-input" style="flex: 1;">
                         <input type="number" id="edit-docenas" required placeholder=" ">
-                        <label>Stock (Docenas)</label>
+                        <label>Docenas</label>
+                    </div>
+                    <div class="grupo-input" style="flex: 1;">
+                        <input type="number" id="edit-precio" required placeholder=" " step="0.01">
+                        <label>Precio x Docena</label>
                     </div>
                 </div>
 
-                <div class="grupo-input">
-                    <label
-                        style="position: static; font-size: 12px; color: #666; margin-bottom: 5px; display: block;">Categoría</label>
-                    <select id="edit-categoria"
-                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background: white;">
-                        <option value="Dama">Dama</option>
-                        <option value="Caballero">Caballero</option>
-                        <option value="Niño">Niño</option>
-                        <option value="Niña">Niña</option>
-                        <option value="Otros">Otros</option>
-                    </select>
+                <!-- Botón STATIC FORCE -->
+                <div class="edit-actions-container">
+                    <button type="submit" class="boton-primario boton-static-force">GUARDAR CAMBIOS</button>
                 </div>
-
-                <!-- Tallas -->
-                <div>
-                    <label style="font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">Tallas
-                        Disponibles</label>
-                    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                        <input type="text" id="input-nueva-talla" placeholder="Ej: M"
-                            style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-transform: uppercase;">
-                        <button type="button" id="btn-add-talla"
-                            style="background: #000; color: #fff; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold;">+</button>
-                    </div>
-                    <div id="lista-tallas-chips" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-                </div>
-
-                <button type="submit" class="boton-primario" style="margin-top: 20px;">GUARDAR CAMBIOS</button>
             </form>
-            <div style="height: 100px;"></div>
         </div>
     </div>
 
     <!-- PANTALLA AGREGAR PRODUCTO (Vendedor) -->
     <div id="pantalla-agregar-producto" class="pantalla-completa oculto"
-        style="background-color: #fff; flex-direction: column; display: none; overflow-y: auto;">
+        style="background-color: #fff; flex-direction: column; overflow-y: auto; justify-content: flex-start; align-items: stretch; display: none;">
         <header class="header-detalle" style="position: sticky; top: 0; background: white; z-index: 10;">
             <button id="btn-atras-agregar" class="btn-icono">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
                 </svg>
             </button>
-            <span class="titulo-header">Nuevo Producto</span>
-            <div style="width: 40px;"></div>
+            <img src="assets/img/logo_kiwi.png" alt="Kiwi" class="logo-header-detalle">
+            <div style="width: 24px;"></div> <!-- Espacio para equilibrar header -->
         </header>
-        <div style="padding: 20px; max-width: 600px; margin: 0 auto; width: 100%;">
-            <form id="form-agregar-producto" style="display: flex; flex-direction: column; gap: 1.5rem;">
 
-                <!-- Imagen -->
-                <div class="campo-imagen-admin" style="text-align: center;">
-                    <label for="add-input-imagen" style="cursor: pointer; display: inline-block;">
-                        <img id="add-preview-imagen" src=""
-                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; display: none;">
-                        <div id="add-placeholder-img"
-                            style="width: 120px; height: 120px; background: #eee; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #999;">
-                            📷
-                        </div>
-                        <div
-                            style="margin-top: 8px; font-size: 14px; color: var(--color-secundario); font-weight: 600;">
-                            Subir Foto</div>
-                    </label>
-                    <input type="file" id="add-input-imagen" accept="image/*" style="display: none;">
-                </div>
+        <div class="add-product-content">
+            <form id="form-agregar-producto" class="add-product-form">
 
+                <!-- 1. Nombre -->
                 <div class="grupo-input">
                     <input type="text" id="add-nombre" required placeholder=" ">
                     <label>Nombre del Producto</label>
                 </div>
+
+                <!-- 2. Referencia -->
                 <div class="grupo-input">
                     <input type="text" id="add-referencia" required placeholder=" ">
                     <label>Referencia</label>
                 </div>
 
-                <div style="display: flex; gap: 15px;">
-                    <div class="grupo-input" style="flex: 1;">
-                        <input type="number" id="add-precio" required placeholder=" " step="0.01">
-                        <label>Precio ($)</label>
+                <!-- 3. Categoría -->
+                <div>
+                    <label class="label-titulo-campo">Categoría</label>
+                    <div style="position: relative;">
+                        <select id="add-categoria" class="select-moderno">
+                            <option value="" disabled selected>Seleccionar</option>
+                            <option value="Suéter">Suéter</option>
+                            <option value="Blusa">Blusa</option>
+                            <option value="Jeans">Jeans</option>
+                            <option value="Enterizo">Enterizo</option>
+                            <option value="Conjunto">Conjunto</option>
+                            <option value="Short">Short</option>
+                            <option value="Falda">Falda</option>
+                            <option value="Body">Body</option>
+                            <option value="Traje">Traje</option>
+                            <option value="Licra">Licra</option>
+                            <option value="Traje de baño">Traje de baño</option>
+                            <option value="Mallas">Mallas</option>
+                        </select>
                     </div>
+                </div>
+
+                <!-- 4. Imagen -->
+                <div class="campo-imagen-edit">
+                    <label for="add-input-imagen" class="imagen-edit-trigger">
+                        <img id="add-preview-imagen" src="" class="imagen-edit-preview">
+                        <div id="add-placeholder-img" class="imagen-edit-placeholder">
+                            <span>Toca para agregar imagen</span>
+                        </div>
+                    </label>
+                    <input type="file" id="add-input-imagen" accept="image/*" style="display: none;">
+                </div>
+
+                <!-- 5. Tallas -->
+                <div class="tallas-edit-container">
+                    <label class="label-titulo-campo">Agregar conjunto de tallas:</label>
+                    <div class="input-talla-row">
+                        <input type="text" id="add-input-nueva-talla" placeholder="Ej: S, M, L"
+                            class="input-talla-field">
+                        <button type="button" id="btn-add-talla-agregar" class="btn-add-talla">+</button>
+                    </div>
+                    <div id="add-lista-tallas-chips" class="lista-tallas-chips"></div>
+                </div>
+
+                <!-- 6. Docenas y Precio -->
+                <div style="display: flex; gap: 1rem;">
                     <div class="grupo-input" style="flex: 1;">
                         <input type="number" id="add-docenas" required placeholder=" ">
-                        <label>Stock (Docenas)</label>
+                        <label>Docenas</label>
+                    </div>
+                    <div class="grupo-input" style="flex: 1;">
+                        <input type="number" id="add-precio" required placeholder=" " step="0.01">
+                        <label>Precio x Docena</label>
                     </div>
                 </div>
 
-                <div class="grupo-input">
-                    <label
-                        style="position: static; font-size: 12px; color: #666; margin-bottom: 5px; display: block;">Categoría</label>
-                    <select id="add-categoria"
-                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background: white;">
-                        <option value="Dama">Dama</option>
-                        <option value="Caballero">Caballero</option>
-                        <option value="Niño">Niño</option>
-                        <option value="Niña">Niña</option>
-                        <option value="Otros">Otros</option>
-                    </select>
+                <div class="add-actions-container">
+                    <button type="submit" class="boton-primario boton-static-force">AGREGAR PRODUCTO</button>
                 </div>
-
-                <!-- Tallas -->
-                <div>
-                    <label style="font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">Tallas
-                        Disponibles</label>
-                    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                        <input type="text" id="add-input-nueva-talla" placeholder="Ej: M"
-                            style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-transform: uppercase;">
-                        <button type="button" id="btn-add-talla-agregar"
-                            style="background: #000; color: #fff; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold;">+</button>
-                    </div>
-                    <div id="add-lista-tallas-chips" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-                </div>
-
-                <button type="submit" class="boton-primario" style="margin-top: 20px;">AGREGAR PRODUCTO</button>
             </form>
             <div style="height: 100px;"></div>
         </div>
