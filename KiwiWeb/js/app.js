@@ -1355,6 +1355,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
+
         const pedido = {
             comprador: inputNombre.value.trim(), // Antes cliente.nombre
             celular: inputCelular.value.trim(),  // Antes cliente.celular
@@ -1369,7 +1370,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             estado: 'Pendiente', // Capitalizado (Android usa: Pendiente, Aceptada, Devuelta)
             motivoRechazo: "",
-            plataforma: 'web'
+            plataforma: 'web',
+
+            // FIX: Agregar info del dispositivo para que Cloud Functions envíen notificaciones
+            userAgent: navigator.userAgent || 'unknown',
+            deviceType: /mobile|android|iphone|ipad/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
         };
 
         // Transacción de Escritura (Atomicidad: Pedido + Inventario)
