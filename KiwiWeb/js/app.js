@@ -143,6 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     toggleModoAdmin(true);
 
                     // Navegar al Catálogo
+                    if (/android/i.test(navigator.userAgent)) {
+                        history.pushState({ screen: 'catalogo' }, "Catálogo", "#catalogo");
+                    }
                     cambiarPantalla(pantallaLogin, pantallaCatalogo);
 
                     // Resetear formulario
@@ -173,6 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 controlesAdmin.classList.remove('oculto');
                 controlesAdmin.style.display = 'block';
             }
+            // Iniciar listener de solicitudes y badge
+            if (typeof cargarSolicitudesVendedora === 'function') {
+                cargarSolicitudesVendedora();
+            }
             // Forzar re-renderizado para mostrar botones de eliminar
             aplicarFiltrosCombinados();
         } else {
@@ -184,6 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 controlesAdmin.classList.add('oculto');
                 controlesAdmin.style.display = 'none';
             }
+            // Detener listener admin si existe
+            if (typeof unsubscribeSolicitudesAdmin === 'function' && unsubscribeSolicitudesAdmin) {
+                unsubscribeSolicitudesAdmin();
+                unsubscribeSolicitudesAdmin = null;
+            }
         }
     }
 
@@ -192,6 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnComprador.addEventListener('click', () => {
             esAdmin = false;
             toggleModoAdmin(false);
+            if (/android/i.test(navigator.userAgent)) {
+                history.pushState({ screen: 'catalogo' }, "Catálogo", "#catalogo");
+            }
             cambiarPantalla(pantallaLogin, pantallaCatalogo);
         });
     }
@@ -294,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (esAdmin) {
                 // Modo Vendedor: Editar
                 card.onclick = () => {
+                    history.pushState({ screen: 'editar' }, "Editar Producto", "#editar");
                     mostrarPantallaEditar(producto);
                 };
             } else {
@@ -688,6 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Mostrar pantalla
+        history.pushState({ screen: 'detalle' }, "Detalle Producto", "#detalle");
         pantallaDetalle.classList.remove('oculto');
         pantallaDetalle.style.display = 'flex';
         // Animacion simple de entrada
@@ -959,6 +976,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Navegación: Carrito -> Factura (Inicio Checkout)
     btnRealizarPedido.addEventListener('click', () => {
         checkoutPendiente = true; // ACTIVAR PERSISTENCIA
+
+        // Push State para soportar Back Button
+        history.pushState({ screen: 'factura' }, "Factura", "#factura");
+
         cambiarPantalla(pantallaCarrito, pantallaFactura, 'flex'); // Navegación Suave
 
         // NO ocultamos Nav Bar
@@ -1504,10 +1525,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (badgeAdminSolicitudes) {
-                    if (pendientes > 0) {
-                        badgeAdminSolicitudes.textContent = ''; // Sin número, solo punto
+                    const elPantalla = document.getElementById('pantalla-solicitudes-vendedora');
+                    const estaVisible = elPantalla && !elPantalla.classList.contains('oculto') && elPantalla.style.display !== 'none';
+
+                    // Mostrar solo si hay pendientes Y NO estoy viendo la pantalla
+                    if (pendientes > 0 && !estaVisible) {
+                        badgeAdminSolicitudes.textContent = '';
                         badgeAdminSolicitudes.classList.remove('oculto');
                     } else {
+                        // Si no hay pendientes o estoy viendo la pantalla, ocultar
                         badgeAdminSolicitudes.classList.add('oculto');
                     }
                 }
@@ -2204,6 +2230,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mostrar con transición
         cambiarPantalla(pantallaCatalogo, pantallaAgregar, 'flex');
 
+        // History Support
+        history.pushState({ screen: 'agregar' }, "Agregar Producto", "#agregar");
+
         // Ocultar FABs Admin
         const controlesAdmin = document.getElementById('controles-admin');
         if (controlesAdmin) {
@@ -2211,6 +2240,10 @@ document.addEventListener('DOMContentLoaded', () => {
             controlesAdmin.style.display = 'none';
         }
     }
+
+
+
+
 
     // GUARDAR NUEVO PRODUCTO
     if (formAgregar) {
@@ -2555,3 +2588,106 @@ if (document.readyState === 'loading') {
 } else {
     configurarMensajesEspanol();
 }
+
+// --- LISTENERS RETORNO COMPRADOR (Tabs) ---
+const btnAtrasCarrito = document.getElementById('btn-atras-carrito');
+if (btnAtrasCarrito) {
+    btnAtrasCarrito.addEventListener('click', () => {
+        const tabInicio = document.querySelector('.nav-item[data-tab="inicio"]');
+        if (tabInicio) tabInicio.click();
+    });
+}
+
+const btnAtrasSolicitudes = document.getElementById('btn-atras-solicitudes');
+if (btnAtrasSolicitudes) {
+    btnAtrasSolicitudes.addEventListener('click', () => {
+        const tabInicio = document.querySelector('.nav-item[data-tab="inicio"]');
+        if (tabInicio) tabInicio.click();
+    });
+}
+
+// --- SOPORTE BACK BUTTON: NAVEGACIÓN TABS & FABs ---
+document.addEventListener('click', (e) => {
+    // 1. Bottom Navigation Tabs (Comprador/General)
+    const navItem = e.target.closest('.nav-item');
+    if (navItem) {
+        // Corrección iOS: No verificar .activo aquí porque el listener original ya lo habrá activado antes.
+        // Siempre permitir el pushState si se hace click.
+
+        const tab = navItem.dataset.tab;
+        if (tab === 'carrito') {
+            console.log("PushState: Carrito");
+            history.pushState({ screen: 'carrito' }, "Carrito", "#carrito");
+        } else if (tab === 'solicitudes') {
+            console.log("PushState: Solicitudes");
+            history.pushState({ screen: 'solicitudes' }, "Solicitudes", "#solicitudes");
+        }
+    }
+
+    // 2. FAB Solicitudes (Vendedor - #btn-admin-solicitudes)
+    const btnAdminSolicitudes = e.target.closest('#btn-admin-solicitudes');
+    if (btnAdminSolicitudes) {
+        console.log("PushState: Solicitudes Admin");
+        // Ocultar Badge inmediatamente al entrar
+        const badge = document.getElementById('badge-admin-solicitudes');
+        if (badge) badge.classList.add('oculto');
+
+        history.pushState({ screen: 'solicitudes' }, "Solicitudes Admin", "#admin-solicitudes");
+    }
+});
+
+// --- SOPORTE BACK BUTTON (ANDROID/IOS) ---
+window.addEventListener('popstate', (event) => {
+    console.log("Evento PopState detectado:", event.state);
+
+    // Definir pantallas overlays y sus botones de cierre
+    const overlays = [
+        { id: 'pantalla-detalle', btnClose: 'btn-atras' },
+        { id: 'pantalla-editar-producto', btnClose: 'btn-atras-editar' },
+        { id: 'pantalla-agregar-producto', btnClose: 'btn-atras-agregar' },
+        { id: 'pantalla-factura', btnClose: 'btn-atras-factura' },
+        { id: 'pantalla-solicitudes', btnClose: 'btn-atras-solicitudes' }, // Comprador
+        { id: 'pantalla-solicitudes-vendedora', btnClose: 'btn-atras-solicitudes-vendedora' }, // Vendedor (Admin)
+        { id: 'lightbox-imagen', btnClose: 'btn-cerrar-lightbox' },
+        { id: 'pantalla-carrito', btnClose: 'btn-atras-carrito' }
+    ];
+
+    // Buscar la overlay visible con mayor z-index (o la primera visible)
+    for (const overlay of overlays) {
+        const el = document.getElementById(overlay.id);
+        if (el && !el.classList.contains('oculto') && el.style.display !== 'none') {
+            const btn = document.getElementById(overlay.btnClose);
+            if (btn) {
+                console.log("Cerrando pantalla por Back Button:", overlay.id);
+                btn.click(); // Simular click para ejecutar toda la lógica de limpieza asociada
+                return; // Solo cerrar una a la vez
+            } else {
+                // Fallback si no hay botón (raro)
+                el.classList.add('oculto');
+                setTimeout(() => el.style.display = 'none', 300);
+            }
+        }
+    }
+
+    // 3. Si no hay overlays -> Estamos en nivel base (Catálogo/Login)
+    const pCatalogo = document.getElementById('pantalla-catalogo');
+    if (pCatalogo && !pCatalogo.classList.contains('oculto') && pCatalogo.style.display !== 'none') {
+        const btnLogout = document.getElementById('btn-logout');
+        if (btnLogout) {
+            // Detección: Solo Android debe mostrar el diálogo al ir atrás. iPhone (iOS) sigue estándar.
+            const isAndroid = /android/i.test(navigator.userAgent);
+
+            if (isAndroid) {
+                console.log("Back en Catálogo (Android) -> Logout Dialog");
+
+                // Empujar estado de nuevo para que si cancela, el Back siga funcionando
+                history.pushState({ screen: 'catalogo' }, "Catálogo", "#catalogo");
+
+                // Trigger Logout Click (abre confirmación)
+                btnLogout.click();
+            }
+        }
+    }
+
+    // Si estamos en login, dejamos pasar el evento default (cerrar app o ir atrás historial)
+});

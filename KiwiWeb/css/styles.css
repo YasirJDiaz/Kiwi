@@ -2220,3 +2220,26 @@ select.input-selector {
     font-weight: 600;
     cursor: pointer;
 }
+
+/* Badge de Notificación (Círculo Verde) */
+.badge-notificacion {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-secundario);
+    /* Verde Neon */
+    border: 2px solid #fff;
+    /* Borde blanco para separar */
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.badge-notificacion.oculto {
+    transform: scale(0);
+    opacity: 0;
+}
