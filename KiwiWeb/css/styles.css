@@ -370,7 +370,7 @@ body {
     box-sizing: border-box;
 
     /* Soporte Safe Area Top + Padding extra */
-    padding-top: max(0.75rem, env(safe-area-inset-top));
+    padding-top: max(2.5rem, env(safe-area-inset-top));
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
 }
@@ -2230,8 +2230,8 @@ select.input-selector {
     height: 16px;
     background-color: var(--color-secundario);
     /* Verde Neon */
-    border: 2px solid #fff;
-    /* Borde blanco para separar */
+    border: none;
+    /* Sin borde blanco */
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 10;
@@ -2239,7 +2239,56 @@ select.input-selector {
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.badge-notificacion.oculto {
-    transform: scale(0);
-    opacity: 0;
+
+/* Ajuste Desktop para Factura - Bajar contenido */
+@media (min-width: 1024px) {
+    .factura-content {
+        padding-top: 5rem !important;
+        /* Forzar bajada en PC */
+        max-width: 600px;
+        /* Mantener centrado bonito */
+        margin: 0 auto;
+    }
+}
+
+/* =========================================
+   PANTALLA DE MANTENIMIENTO
+   ========================================= */
+#pantalla-mantenimiento {
+    background-color: #FFFFFF;
+    z-index: 9999;
+}
+
+.contenedor-mantenimiento {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.titulo-mantenimiento {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin-bottom: 2rem;
+    letter-spacing: -0.5px;
+}
+
+.imagen-mantenimiento {
+    width: 80%;
+    max-width: 300px;
+    height: auto;
+    margin-bottom: 2rem;
+    object-fit: contain;
+}
+
+.descripcion-mantenimiento {
+    font-size: 1rem;
+    color: var(--color-texto-gris);
+    line-height: 1.6;
+    margin: 0;
 }

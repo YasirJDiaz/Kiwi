@@ -1310,7 +1310,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Acción: Enviar Pedido (Actualizado con Firestore)
-    btnEnviarPedido.addEventListener('click', () => {
+    btnEnviarPedido.addEventListener('click', (e) => {
+        e.preventDefault(); // FIX: Evitar recarga de página en iPhone/Android
+
         const nombreValido = validarNombre();
         const celularValido = validarCelular();
         const emailValido = validarEmail();
