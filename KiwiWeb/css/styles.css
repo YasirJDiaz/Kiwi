@@ -2292,3 +2292,11 @@ select.input-selector {
     line-height: 1.6;
     margin: 0;
 }
+
+.video-mantenimiento {
+    width: 80%;
+    max-width: 400px;
+    height: auto;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+}
