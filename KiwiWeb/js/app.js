@@ -18,14 +18,89 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-// Autenticación Anónima (Necesaria para escribir en Firestore si las reglas requieren auth)
+// Autenticación Anónima (Opcional - no bloquea si falla)
 auth.signInAnonymously()
     .then(() => {
         console.log("Autenticado anónimamente para Firestore");
     })
     .catch((error) => {
-        console.error("Error en autenticación anónima:", error);
+        console.warn("Auth anónima no disponible (puede ser normal):", error.code);
+        // Continuar sin auth - no bloquear la app
     });
+
+// ========================================
+// FIREBASE CLOUD MESSAGING (Push Notifications)
+// ========================================
+let messaging = null;
+let currentFCMToken = null;
+
+// Inicializar FCM solo si el navegador lo soporta
+if (firebase.messaging.isSupported()) {
+    messaging = firebase.messaging();
+
+    // NOTA: El service worker (firebase-messaging-sw.js) maneja TODAS las notificaciones
+    // No usamos onMessage aquí para evitar notificaciones duplicadas
+
+    // messaging.onMessage((payload) => {
+    //     console.log('[FCM] Mensaje recibido en primer plano:', payload);
+    //     // Service worker ya muestra la notificación
+    // });
+} else {
+    console.warn('[FCM] Este navegador no soporta Firebase Messaging');
+}
+
+// Función para solicitar permisos y obtener token FCM
+async function requestNotificationPermission() {
+    if (!messaging) {
+        console.warn('[FCM] Messaging no disponible');
+        return null;
+    }
+
+    try {
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+            console.log('[FCM] Permiso de notificación concedido');
+
+            // Obtener token FCM con VAPID key
+            const token = await messaging.getToken({
+                vapidKey: 'BLCKeXldoX7vnBRIojWA6ltqb0ljIx2RJ0OhKtzlpxGgwEsJ_Qab74MsdgZpo4L5Va6WIqB-76VBMZv4vkxS1cQ'
+            });
+            console.log('[FCM] Token obtenido:', token);
+            currentFCMToken = token;
+
+            return token;
+        } else {
+            console.log('[FCM] Permiso de notificación denegado');
+            return null;
+        }
+    } catch (error) {
+        console.error('[FCM] Error al solicitar permisos:', error);
+        return null;
+    }
+}
+
+// Función para guardar token FCM en Firestore (para vendedores)
+async function saveFCMTokenToFirestore(token, userId) {
+    if (!token || !userId) return;
+
+    try {
+        // Generar un ID único para este dispositivo basado en el token
+        const deviceId = token.substring(0, 20); // Usar primeros 20 chars del token como ID
+
+        await db.collection('fcmTokens').doc(userId).collection('devices').doc(deviceId).set({
+            token: token,
+            platform: 'web',
+            deviceType: /mobile|android|iphone|ipad/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+            userAgent: navigator.userAgent,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        console.log('[FCM] Token guardado en Firestore (deviceId:', deviceId, ')');
+    } catch (error) {
+        console.error('[FCM] Error al guardar token:', error);
+    }
+}
 
 // Estado de Productos (Ya no es mock estático, se llenará con DB)
 let productos = [];
@@ -140,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     esAdmin = true;
 
                     // Configurar UI Admin
-                    toggleModoAdmin(true);
+                    toggleModoAdmin(true, userCredential.user.uid);
 
                     // Navegar al Catálogo
                     if (/android/i.test(navigator.userAgent)) {
@@ -163,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Función para activar/desactivar modo Admin
-    function toggleModoAdmin(activo) {
+    function toggleModoAdmin(activo, vendedorUid = null) {
         const navBar = document.getElementById('barra-navegacion');
         const controlesAdmin = document.getElementById('controles-admin');
 
@@ -180,7 +255,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof cargarSolicitudesVendedora === 'function') {
                 cargarSolicitudesVendedora();
             }
-            // Forzar re-renderizado para mostrar botones de eliminar
+
+            // FCM: Solicitar permisos de notificación y registrar token
+            if (messaging && vendedorUid) {
+                requestNotificationPermission().then(token => {
+                    if (token) {
+                        saveFCMTokenToFirestore(token, vendedorUid);
+                    }
+                });
+            }
+
+            // Forzar re-renderizadopara mostrar botones de eliminar
             aplicarFiltrosCombinados();
         } else {
             // Modo Comprador
