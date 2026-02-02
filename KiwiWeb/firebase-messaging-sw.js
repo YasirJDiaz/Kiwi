@@ -17,13 +17,39 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
+// Cache para evitar notificaciones duplicadas
+const recentNotifications = new Map();
+
 // Manejar mensajes en segundo plano
 messaging.onBackgroundMessage((payload) => {
     console.log('[FCM SW] Mensaje recibido:', payload);
 
     const notificationTitle = payload.notification?.title || 'Nueva Solicitud';
+    const notificationBody = payload.notification?.body || 'Tienes un nuevo pedido pendiente';
+
+    // Crear ID único para esta notificación
+    const notificationId = `${notificationTitle}-${notificationBody}`;
+
+    // Verificar si ya mostramos esta notificación recientemente (últimos 5 segundos)
+    const now = Date.now();
+    const lastShown = recentNotifications.get(notificationId);
+
+    if (lastShown && (now - lastShown) < 5000) {
+        console.log('[FCM SW] ⚠️ Notificación duplicada ignorada:', notificationId);
+        return; // Ignorar duplicado
+    }
+
+    // Guardar timestamp de esta notificación
+    recentNotifications.set(notificationId, now);
+
+    // Limpiar cache antiguo (mantener solo últimos 10)
+    if (recentNotifications.size > 10) {
+        const firstKey = recentNotifications.keys().next().value;
+        recentNotifications.delete(firstKey);
+    }
+
     const notificationOptions = {
-        body: payload.notification?.body || 'Tienes un nuevo pedido pendiente',
+        body: notificationBody,
         icon: '/assets/img/icon-192x192.png',
         badge: '/assets/img/icon-192x192.png',
         tag: 'kiwi-notification',
@@ -31,6 +57,7 @@ messaging.onBackgroundMessage((payload) => {
         data: payload.data
     };
 
+    console.log('[FCM SW] ✅ Mostrando notificación:', notificationId);
     return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 

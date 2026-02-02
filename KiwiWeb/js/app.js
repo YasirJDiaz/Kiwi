@@ -31,6 +31,7 @@ auth.signInAnonymously()
 // ========================================
 // FIREBASE CLOUD MESSAGING (Push Notifications)
 // ========================================
+
 let messaging = null;
 let currentFCMToken = null;
 
@@ -85,8 +86,18 @@ async function saveFCMTokenToFirestore(token, userId) {
     if (!token || !userId) return;
 
     try {
-        // Generar un ID único para este dispositivo basado en el token
-        const deviceId = token.substring(0, 20); // Usar primeros 20 chars del token como ID
+        // Generar un ID único y ESTABLE para este dispositivo
+        // Basado en características que no cambian: userAgent + resolución de pantalla
+        const fingerprint = navigator.userAgent + screen.width + screen.height + screen.colorDepth;
+
+        // Crear un hash simple (no necesitamos crypto perfecto, solo consistencia)
+        let hash = 0;
+        for (let i = 0; i < fingerprint.length; i++) {
+            const char = fingerprint.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        const deviceId = 'device_' + Math.abs(hash).toString(36);
 
         await db.collection('fcmTokens').doc(userId).collection('devices').doc(deviceId).set({
             token: token,
