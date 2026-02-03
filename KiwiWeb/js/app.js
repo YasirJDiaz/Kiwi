@@ -35,6 +35,28 @@ auth.signInAnonymously()
 let messaging = null;
 let currentFCMToken = null;
 
+// ========================================
+// DEVICE ID GLOBAL (Para privacidad de pedidos)
+// ========================================
+
+// Generar ID único y ESTABLE del dispositivo basado en características del navegador
+function generateDeviceId() {
+    const fingerprint = navigator.userAgent + screen.width + screen.height + screen.colorDepth;
+
+    // Crear un hash simple (no necesitamos crypto perfecto, solo consistencia)
+    let hash = 0;
+    for (let i = 0; i < fingerprint.length; i++) {
+        const char = fingerprint.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return 'device_' + Math.abs(hash).toString(36);
+}
+
+// Variable global con el deviceId actual (generado al cargar la app)
+let currentDeviceId = generateDeviceId();
+console.log('[Device] ID del dispositivo:', currentDeviceId);
+
 // Inicializar FCM solo si el navegador lo soporta
 if (firebase.messaging.isSupported()) {
     messaging = firebase.messaging();
@@ -86,18 +108,8 @@ async function saveFCMTokenToFirestore(token, userId) {
     if (!token || !userId) return;
 
     try {
-        // Generar un ID único y ESTABLE para este dispositivo
-        // Basado en características que no cambian: userAgent + resolución de pantalla
-        const fingerprint = navigator.userAgent + screen.width + screen.height + screen.colorDepth;
-
-        // Crear un hash simple (no necesitamos crypto perfecto, solo consistencia)
-        let hash = 0;
-        for (let i = 0; i < fingerprint.length; i++) {
-            const char = fingerprint.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32bit integer
-        }
-        const deviceId = 'device_' + Math.abs(hash).toString(36);
+        // Usar el deviceId global generado al inicio
+        const deviceId = currentDeviceId;
 
         await db.collection('fcmTokens').doc(userId).collection('devices').doc(deviceId).set({
             token: token,
@@ -1207,8 +1219,9 @@ document.addEventListener('DOMContentLoaded', () => {
             unsubscribeSolicitudes();
         }
 
-        // Consultar TODAS las solicitudes en tiempo real (Alineado con reglas DB)
+        // Consultar solo las solicitudes de ESTE dispositivo (privacidad por dispositivo)
         unsubscribeSolicitudes = db.collection('solicitudes')
+            .where('deviceId', '==', currentDeviceId)  // FILTRO: Solo pedidos de este dispositivo
             .orderBy('timestampCreacion', 'desc')
             .limit(50)
             .onSnapshot((querySnapshot) => {
@@ -1518,8 +1531,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            // Crear el pedido con ID asignado
-            const pedidoConId = { ...pedido, idFirestore: nuevaSolicitudRef.id };
+            // Crear el pedido con ID asignado + deviceId para privacidad
+            const pedidoConId = {
+                ...pedido,
+                idFirestore: nuevaSolicitudRef.id,
+                deviceId: currentDeviceId  // Para filtrar pedidos por dispositivo
+            };
             transaction.set(nuevaSolicitudRef, pedidoConId);
 
             return nuevaSolicitudRef.id;
