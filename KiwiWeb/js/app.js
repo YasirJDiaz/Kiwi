@@ -125,6 +125,26 @@ async function saveFCMTokenToFirestore(token, userId) {
     }
 }
 
+// Función para suscribir compradores a notificaciones de productos nuevos
+async function suscribirAProductosNuevos(token) {
+    if (!token) return;
+
+    try {
+        console.log('[FCM] Suscribiendo a notificaciones de productos nuevos...');
+
+        // Llamar Cloud Function para suscribir token al topic "new_products"
+        const suscribir = firebase.functions().httpsCallable('suscribirCompradorATopic');
+        const result = await suscribir({ token: token });
+
+        if (result.data.success) {
+            console.log('[FCM] ✅ Suscrito a productos nuevos');
+        }
+    } catch (error) {
+        console.error('[FCM] ❌ Error al suscribir a topic:', error);
+    }
+}
+
+
 // Estado de Productos (Ya no es mock estático, se llenará con DB)
 let productos = [];
 
@@ -303,6 +323,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof unsubscribeSolicitudesAdmin === 'function' && unsubscribeSolicitudesAdmin) {
                 unsubscribeSolicitudesAdmin();
                 unsubscribeSolicitudesAdmin = null;
+            }
+
+            // FCM: Solicitar permisos y suscribir a notificaciones de productos nuevos
+            if (messaging) {
+                requestNotificationPermission().then(token => {
+                    if (token) {
+                        // Suscribir a notificaciones de productos nuevos
+                        suscribirAProductosNuevos(token);
+                    }
+                });
             }
         }
     }
