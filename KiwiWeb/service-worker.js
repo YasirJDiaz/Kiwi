@@ -1,9 +1,11 @@
-// Kiwi PWA Service Worker
+// Kiwii PWA Service Worker
 // Estrategia: Network-First con fallback a Cache
 // Versión dinámica para forzar actualizaciones automáticas
 
-const CACHE_VERSION = 'kiwi-v' + new Date().getTime();
-const CACHE_NAME = CACHE_VERSION;
+const CACHE_NAME_PREFIX = 'kiwi-cache-v';
+const CACHE_VERSION = 'date-' + Date.now(); // Dynamic version
+// v5 - Fix Auto Reload
+const CACHE_NAME = `${CACHE_NAME_PREFIX}${CACHE_VERSION}`;
 
 // Archivos críticos a cachear
 const CRITICAL_ASSETS = [
@@ -31,8 +33,8 @@ self.addEventListener('install', (event) => {
             })
             .then(() => {
                 console.log('[SW] ✅ Archivos críticos cacheados');
-                // Forzar activación inmediata del nuevo SW
-                return self.skipWaiting();
+                // IMPORTANTE: No llamamos a skipWaiting() aquí para que el usuario decida cuándo actualizar
+                // El nuevo SW se quedará en estado "waiting" hasta que se le ordene.
             })
             .catch(err => {
                 console.error('[SW] ❌ Error al cachear archivos:', err);

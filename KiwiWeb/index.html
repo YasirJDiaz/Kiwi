@@ -43,7 +43,7 @@
     </div>
 
     <!-- Pantalla de Mantenimiento (Video) -->
-    <div id="pantalla-mantenimiento-video" class="pantalla-completa oculto" style="display: none;">
+    <div id="pantalla-mantenimiento-video" class="pantalla-completa">
         <div class="contenedor-mantenimiento">
             <h1 class="titulo-mantenimiento">¡ESTAMOS MEJORANDO PARA TI!</h1>
             <video class="video-mantenimiento" autoplay muted loop playsinline>
@@ -808,21 +808,29 @@
         // SERVICE WORKER REGISTRATION - EJECUCIÓN INMEDIATA
         // ========================================
         if ('serviceWorker' in navigator) {
-            // v3 - Fix Android Cache
+            // v4 - Revert updateViaCache + Manual Cache Bust
             console.log('[PASO 0] 🚀 Iniciando registro de Service Worker (inmediato)...');
 
             // IIFE - Se ejecuta inmediatamente sin esperar 'load'
             (async function registerServiceWorker() {
                 try {
-                    // Registrar Service Worker con updateViaCache: 'none' para forzar chequeo de red
-                    const registration = await navigator.serviceWorker.register('./service-worker.js', {
-                        updateViaCache: 'none'
-                    });
+                    // Registrar Service Worker (Sin opciones extra que rompen iOS)
+                    const registration = await navigator.serviceWorker.register('./service-worker.js');
                     console.log('[PASO 1] ✅ Service Worker registrado:', registration.scope);
 
-                    // Para PWAs: Forzar verificación de actualización INMEDIATAMENTE
+                    // Para PWAs: "Empujón" manual al caché
                     if (isPWA()) {
-                        console.log('[PASO 2] 📱 PWA detectada - Forzando verificación de actualización...');
+                        console.log('[PASO 2] 📱 PWA detectada - Iniciando protocolo de actualización...');
+
+                        // TRUCO: Hacemos un fetch manual con timestamp para despertar al caché
+                        try {
+                            await fetch('./service-worker.js?poke=' + Date.now(), { cache: 'no-store' });
+                            console.log('[PASO 2.5] ⚡ Caché "despertado" con fetch manual');
+                        } catch (e) {
+                            console.log('⚠️ Falló poke, continuando normal');
+                        }
+
+                        console.log('[PASO 2.8] 🔄 Ejecutando registration.update()...');
                         await registration.update();
                         console.log('[PASO 3] 🔄 Verificación forzada completada');
                     }
