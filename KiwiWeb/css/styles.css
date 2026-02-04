@@ -527,8 +527,8 @@ body {
     /* Mobile First: 2 columnas mínimo, expande si cabe más */
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
-    /* Espacio para navbar + safe area */
+    padding-bottom: 120px;
+    /* Espacio fijo para navbar (igual que Solicitudes) */
 
     /* Responsive Breakpoint interno */
     @media (min-width: 600px) {
@@ -673,16 +673,19 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    /* Altura = Base (e.g. 64px) + Safe Area */
-    height: calc(4rem + env(safe-area-inset-bottom));
+    /* Altura fija para iOS PWA - el fondo se extiende con min-height */
+    height: 4rem;
+    min-height: calc(4rem + env(safe-area-inset-bottom));
     background-color: #000000;
     display: flex;
     justify-content: space-around;
-    align-items: center;
-    /* Centrado vertical considera el padding-bottom */
+    align-items: flex-start;
+    /* Alinear al inicio para que los iconos estén arriba */
 
+    /* Padding superior para bajar el contenido del borde */
+    padding-top: 0.5rem;
     /* Padding inferior para levantar contenido del Home Indicator */
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 
     border-top-left-radius: 1.25rem;
     /* 20px -> 1.25rem */
@@ -692,7 +695,7 @@ body {
     padding-left: 1rem;
     padding-right: 1rem;
     transition: var(--transicion-suave);
-    overflow: hidden;
+    overflow: visible;
     box-sizing: border-box;
     /* Crucial para height + padding */
 }
@@ -709,12 +712,12 @@ body {
     /* Detrás de los iconos */
     transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
     /* Animación ultranuave (Ease Out Expo) */
-    top: 50%;
-    /* Se posicionará con JS usando transform: translate(...) */
+    top: 0.5rem;
+    /* Alineado con el padding-top de la barra */
     left: 0;
     /* Punto de referencia inicial */
-    margin-top: -25px;
-    /* Centrar verticalmente (mitad de height) */
+    margin-top: 5px;
+    /* Pequeño ajuste para centrar mejor el círculo */
     pointer-events: none;
 }
 
@@ -795,8 +798,8 @@ body {
 
 .lista-carrito {
     padding: 1rem;
-    padding-bottom: calc(9rem + env(safe-area-inset-bottom));
-    /* Espacio para Footer + Nav + Safe Area */
+    padding-bottom: 120px;
+    /* Espacio fijo para navbar (igual que Solicitudes) */
     display: flex;
     flex-direction: column;
     gap: 1rem;

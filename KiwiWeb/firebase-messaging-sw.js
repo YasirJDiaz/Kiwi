@@ -1,5 +1,10 @@
-// Firebase Cloud Messaging Service Worker
-// Este archivo es REQUERIDO por Firebase Messaging
+// ============================================
+// FIREBASE CLOUD MESSAGING SERVICE WORKER
+// ============================================
+// IMPORTANTE: Este Service Worker es EXCLUSIVO para Firebase Cloud Messaging (notificaciones push)
+// El caché de la aplicación (CSS/JS/HTML) es manejado por service-worker.js
+// Ambos SWs conviven sin conflictos ya que tienen responsabilidades separadas
+// ============================================
 
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js');

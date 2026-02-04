@@ -8,8 +8,8 @@
     <title>Kiwi | Lo que necesitas</title>
     <link rel="icon" type="image/png" href="assets/img/logo_kiwi.png">
     <meta name="description" content="Bienvenido a Kiwi, tu tienda de moda favorita.">
-    <link rel="stylesheet" href="css/styles.css?v=1.6">
-    <link rel="stylesheet" href="css/styles-admin.css?v=1.0">
+    <link rel="stylesheet" href="css/styles.css?v=1.0.1">
+    <link rel="stylesheet" href="css/styles-admin.css?v=1.0.1">
     <!-- Fuente moderna (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,7 @@
     <div id="pantalla-mantenimiento" class="pantalla-completa oculto" style="display: none;">
         <div class="contenedor-mantenimiento">
             <h1 class="titulo-mantenimiento">¡ESTAMOS MEJORANDO PARA TI!</h1>
-            <img src="assets/img/kiwi_mantenimiento.png" alt="Mantenimiento" class="imagen-mantenimiento">
+            <img src="assets/img/Kiwi_mantenimiento.png" alt="Mantenimiento" class="imagen-mantenimiento">
             <p class="descripcion-mantenimiento">Por el momento este Kiwi está en mantenimiento, intenta ingresar más
                 tarde</p>
         </div>
@@ -443,7 +443,7 @@
             <!-- Empty State (Visible por defecto) -->
             <div class="mensaje-vacio">
                 <div class="icono-vacio" style="font-size: 48px; margin-bottom: 1rem;">📦</div>
-                <p>No tienes solicitudes activas</p>
+                <p>No tienes solicitudes registradas</p>
                 <p style="font-size: 12px; margin-top: 0.5rem; color: #aaa;">Tus pedidos aparecerán aquí</p>
             </div>
         </div>
@@ -471,7 +471,7 @@
 
             <!-- Empty State -->
             <div id="mensaje-vacio-vendedora" class="mensaje-vacio vendor-empty-state">
-                <p>No hay solicitudes pendientes.</p>
+                <p>No hay solicitudes registradas.</p>
             </div>
         </div>
     </div>
@@ -694,6 +694,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
+    <!-- Diálogo de Actualización (PWA/Safari) -->
+    <div id="update-dialog-overlay" class="dialog-overlay oculto" style="display: none;">
+        <div class="dialog-card" style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 1rem;">🥝🎉</div>
+            <h3 style="margin-top: 0; font-size: 20px; color: #000;">¡Nueva Versión Disponible!</h3>
+            <p style="margin: 15px 0; font-size: 15px; color: #555;">
+                Hay mejoras y nuevas funciones esperándote.<br>
+                Actualiza ahora para disfrutarlas.
+            </p>
+            <div class="dialog-actions" style="margin-top: 20px;">
+                <button id="btn-update-later" class="btn-dialog secundario">Más Tarde</button>
+                <button id="btn-update-now" class="btn-dialog primario">Actualizar Ahora</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Dialog (Reemplazo de alert/confirm) -->
     <div id="custom-dialog-overlay" class="dialog-overlay oculto" style="display: none;">
         <div class="dialog-card">
@@ -721,20 +737,167 @@
     </div>
 
     <script src="js/pdfGenerator.js"></script>
-    <script src="js/app.js?v=1.2"></script>
+    <script src="js/app.js?v=1.0.1"></script>
 
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA Service Worker Registration - Ejecución Inmediata para PWAs -->
     <script>
+        // ========================================
+        // DETECCIÓN DE DISPOSITIVO/NAVEGADOR
+        // ========================================
+        function isPWA() {
+            // Detectar si está instalado como PWA
+            const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true; // iOS
+            console.log('🔍 isPWA:', isPWAStandalone);
+            return isPWAStandalone;
+        }
+
+        function isSafari() {
+            // Detectar Safari (incluye iOS Safari)
+            const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            console.log('🔍 isSafari:', isSafariBrowser);
+            return isSafariBrowser;
+        }
+
+        function shouldShowUpdateDialog() {
+            // Mostrar diálogo si:
+            // 1. Es PWA instalada, O
+            // 2. Es Safari (iOS o Mac)
+            const shouldShow = isPWA() || isSafari();
+            console.log('🔍 shouldShowUpdateDialog:', shouldShow);
+            return shouldShow;
+        }
+
+        // ========================================
+        // FUNCIONES DEL DIÁLOGO DE ACTUALIZACIÓN
+        // ========================================
+        const updateDialog = document.getElementById('update-dialog-overlay');
+        let newWorkerWaiting = null;
+
+        function showUpdateDialog(worker) {
+            newWorkerWaiting = worker;
+            updateDialog.classList.remove('oculto');
+            updateDialog.style.display = 'flex';
+            console.log('📢 Mostrando diálogo de actualización');
+        }
+
+        function hideUpdateDialog() {
+            updateDialog.classList.add('oculto');
+            updateDialog.style.display = 'none';
+        }
+
+        function applyUpdate() {
+            if (newWorkerWaiting) {
+                console.log('✅ Usuario confirmó actualización, aplicando...');
+                newWorkerWaiting.postMessage({ type: 'SKIP_WAITING' });
+                hideUpdateDialog();
+                // El reload se hará en el evento 'controllerchange'
+            }
+        }
+
+        // ========================================
+        // EVENT LISTENERS DEL DIÁLOGO
+        // ========================================
+        document.getElementById('btn-update-now').addEventListener('click', applyUpdate);
+        document.getElementById('btn-update-later').addEventListener('click', () => {
+            console.log('⏰ Usuario pospuso actualización');
+            hideUpdateDialog();
+        });
+
+        // ========================================
+        // SERVICE WORKER REGISTRATION - EJECUCIÓN INMEDIATA
+        // ========================================
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
+            // v3 - Fix Android Cache
+            console.log('[PASO 0] 🚀 Iniciando registro de Service Worker (inmediato)...');
+
+            // IIFE - Se ejecuta inmediatamente sin esperar 'load'
+            (async function registerServiceWorker() {
+                try {
+                    // Registrar Service Worker con updateViaCache: 'none' para forzar chequeo de red
+                    const registration = await navigator.serviceWorker.register('./service-worker.js', {
+                        updateViaCache: 'none'
                     });
-            });
+                    console.log('[PASO 1] ✅ Service Worker registrado:', registration.scope);
+
+                    // Para PWAs: Forzar verificación de actualización INMEDIATAMENTE
+                    if (isPWA()) {
+                        console.log('[PASO 2] 📱 PWA detectada - Forzando verificación de actualización...');
+                        await registration.update();
+                        console.log('[PASO 3] 🔄 Verificación forzada completada');
+                    }
+
+                    // Función para manejar actualizaciones encontradas
+                    function handleUpdateFound(reg) {
+                        const newWorker = reg.installing;
+                        if (!newWorker) return;
+
+                        console.log('[PASO 4] 🔄 Nueva versión del Service Worker detectada');
+
+                        newWorker.addEventListener('statechange', () => {
+                            console.log(`[PASO 5] 📊 Estado del SW: ${newWorker.state}`);
+
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Hay una nueva versión disponible
+                                console.log('[PASO 6] ✨ Nueva versión instalada y lista');
+
+                                // ESTRATEGIA HÍBRIDA:
+                                if (shouldShowUpdateDialog()) {
+                                    // PWA o Safari: Mostrar diálogo
+                                    console.log('[PASO 7A] 📱 PWA/Safari detectado → Mostrando diálogo de actualización');
+                                    showUpdateDialog(newWorker);
+                                } else {
+                                    // Chrome/Desktop: Auto-reload
+                                    console.log('[PASO 7B] 💻 Chrome/Desktop detectado → Auto-actualización en 1 segundo...');
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 1000);
+                                }
+                            }
+                        });
+                    }
+
+                    // Escuchar evento updatefound
+                    registration.addEventListener('updatefound', () => handleUpdateFound(registration));
+
+                    // Para PWAs: También verificar si ya hay un SW waiting
+                    if (registration.waiting && isPWA()) {
+                        console.log('⚠️ Ya hay un SW esperando - Mostrando inmediatamente');
+                        handleUpdateFound(registration);
+                    }
+
+                    // Verificar actualizaciones periódicamente (cada 30 segundos para PWA, 60 para otros)
+                    const updateInterval = isPWA() ? 30000 : 60000;
+                    console.log(`⏱️ Verificando actualizaciones cada ${updateInterval / 1000}s`);
+
+                    setInterval(() => {
+                        console.log('🔄 Verificación periódica de actualizaciones...');
+                        registration.update();
+                    }, updateInterval);
+
+                    // Detectar cuando el SW toma control (después de skipWaiting)
+                    navigator.serviceWorker.addEventListener('controllerchange', () => {
+                        console.log('🔄 Service Worker actualizado, recargando página...');
+                        window.location.reload();
+                    });
+
+                    // Para PWAs: Verificar actualizaciones cuando la app vuelve a estar visible
+                    if (isPWA()) {
+                        document.addEventListener('visibilitychange', () => {
+                            if (!document.hidden) {
+                                console.log('👁️ App visible - Verificando actualizaciones...');
+                                registration.update();
+                            }
+                        });
+                    }
+
+                } catch (err) {
+                    console.error('❌ Error al registrar Service Worker:', err);
+                }
+            })();
+        } else {
+            console.warn('⚠️ Service Worker no soportado en este navegador');
         }
     </script>
 </body>
